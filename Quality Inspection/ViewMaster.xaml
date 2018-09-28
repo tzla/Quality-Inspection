@@ -1,0 +1,153 @@
+﻿<Page
+    x:Class="Quality_Inspection.ViewMaster"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Quality_Inspection"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <CalendarView x:Name="Cale" HorizontalAlignment="Left" Margin="37,38,0,0" VerticalAlignment="Top" CalendarViewDayItemChanging="CalendarView_CalendarViewDayItemChanging" SelectedDatesChanged="hola"/>
+        <TextBox x:Name="gg" HorizontalAlignment="Left" Margin="150,399,0,0" Text="TextBox" VerticalAlignment="Top"/>
+        <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
+            <Grid x:Name="Grud" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0" Width="749">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock HorizontalAlignment="Center" Text="" VerticalAlignment="Center" Height="30"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 1" VerticalAlignment="Center"  Grid.Row="1"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 1A" VerticalAlignment="Center" Grid.Row="2"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 2" VerticalAlignment="Center" Grid.Row="3"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 2A" VerticalAlignment="Center" Grid.Row="4"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 3" VerticalAlignment="Center" Grid.Row="5"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 3A" VerticalAlignment="Center" Grid.Row="6"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 4" VerticalAlignment="Center" Grid.Row="7"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 5" VerticalAlignment="Center" Grid.Row="8"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 5B" VerticalAlignment="Center" Grid.Row="9"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 6" VerticalAlignment="Center" Grid.Row="10"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 6A" VerticalAlignment="Center" Grid.Row="11"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 7" VerticalAlignment="Center" Grid.Row="12"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 8" VerticalAlignment="Center" Grid.Row="13"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 9" VerticalAlignment="Center" Grid.Row="14"/>
+                <TextBlock HorizontalAlignment="Center" Text="Line 10" VerticalAlignment="Center" Grid.Row="15"/>
+
+                <TextBlock HorizontalAlignment="Center" Text="Morning" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="Auto" />
+                <TextBlock HorizontalAlignment="Center" Text="First Break" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0" Grid.Column="2" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Lunch" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="3" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Second Break" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="4" Height="Auto"/>
+
+            </Grid>
+        </Border>
+        <Border x:Name="DDD" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
+            <Grid HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" Width="1024">
+                <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1024" Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="513*"/>
+                        <ColumnDefinition Width="511*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1024">
+                        <DatePicker x:Name="loadDate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="42,0,0,0"/>
+                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" />
+                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="LineBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Width="64" />
+                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="ShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Width="64" />
+                    </StackPanel>
+                    <CheckBox x:Name="SampleCheck_true" Content="Production Pan Matches Sample" HorizontalAlignment="Left" Margin="45,72,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="SampleCheck_false" Content="N/A" HorizontalAlignment="Left" Margin="322,72,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="PackageCheck_true" Content="Pans Fit Into Sample Package" HorizontalAlignment="Left" Margin="45,109,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="PackageCheck_false" Content="N/A" HorizontalAlignment="Left" Margin="322,109,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="LidCheck_true" Content="Does Lid Fit Onto Pan" HorizontalAlignment="Left" Margin="45,145,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="LidCheck_false" Content="N/A" HorizontalAlignment="Left" Margin="322,144,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="DefectCheck_true" Content="Does Pan Have Defects" HorizontalAlignment="Left" Margin="45,180,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <CheckBox x:Name="DefectCheck_false" Content="No" HorizontalAlignment="Left" Margin="322,180,0,0" VerticalAlignment="Top" IsEnabled="False" />
+                    <TextBlock Text="QA Tech Signiture:" Grid.Column="1" HorizontalAlignment="Left" Margin="0.2,185,0,0" VerticalAlignment="Top" />
+                    <Grid x:Name="DefectGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,231,0,0" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Height="120" Background="LightGray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="150" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <CheckBox x:Name="D0" Content="Scratches" HorizontalAlignment="Left" VerticalAlignment="Center" Tag="Defect"/>
+                        <CheckBox x:Name="D1" Content="Dents" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Tag="Defect"/>
+                        <CheckBox x:Name="D2" Content="Sharp Edges" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Tag="Defect"/>
+                        <CheckBox x:Name="D3" Content="Loose Cups" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Tag="Defect" />
+                        <CheckBox x:Name="D4" Content="Discoloration" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1" Tag="Defect"/>
+                        <CheckBox x:Name="D5" Content="Rust" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Tag="Defect"/>
+                        <CheckBox x:Name="D6" Content="Peeling Coating" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Tag="Defect"/>
+                        <CheckBox x:Name="D7" Content="Delamination" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" Tag="Defect"/>
+                        <CheckBox x:Name="D8" Content="Uneven Bottom" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="2" Tag="Defect"/>
+                        <CheckBox x:Name="D9" Content="Open Curl" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Tag="Defect"/>
+                        <CheckBox x:Name="D10" Content="Wrinkled Edges" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2" Tag="Defect"/>
+                        <CheckBox x:Name="D11" Content="Cracks" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Grid.RowSpan="1" Tag="Defect" />
+                    </Grid>
+                    <TextBlock x:Name="QT_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,180,0,0" Text="" VerticalAlignment="Top" />
+                    <TextBlock x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,247,0,0" Text="" VerticalAlignment="Top" />
+                    <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="382.2,291,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+                        <Image HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" Source="Assets/mager.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
+                    </Border>
+                    <TextBlock Text="Diesetter Signiture:" Grid.Column="1" HorizontalAlignment="Left" Margin="0.2,254,0,0" VerticalAlignment="Top" />
+                </Grid>
+                <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,131,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
+                    </Grid.RenderTransform>
+                    <InkCanvas x:Name="inkyCanvas" HorizontalAlignment="Left" VerticalAlignment="Center" Width="298" Height="131.2">
+                        <InkCanvas.RenderTransform>
+                            <CompositeTransform ScaleX="1" ScaleY="1"/>
+                        </InkCanvas.RenderTransform>
+                    </InkCanvas>
+
+
+                </Grid>
+                <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,198,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
+                    </Grid.RenderTransform>
+                    <InkCanvas x:Name="inkyCanvasDS" HorizontalAlignment="Left" VerticalAlignment="Center" Width="298" Height="131.2">
+                        <InkCanvas.RenderTransform>
+                            <CompositeTransform ScaleX="1" ScaleY="1"/>
+                        </InkCanvas.RenderTransform>
+                    </InkCanvas>
+
+
+                </Grid>
+                <TextBlock x:Name="Time" Text="34:72" FontSize="18" Margin="513,108,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+
+            </Grid>
+        </Border>
+        <Button Content="Back" HorizontalAlignment="Left" Margin="150,457,0,0" VerticalAlignment="Top" Click="BackToMain"/>
+    </Grid>
+</Page>
