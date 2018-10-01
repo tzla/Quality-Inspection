@@ -101,8 +101,9 @@ namespace Quality_Inspection
                 if(thisPart.partName == PartName)
                 {
                     List<MainPage.MyDate> theseDates = thisPart.dates;
-                    theseDates.OrderBy(x => x.date);
-                    foreach (MainPage.MyDate thisdate in theseDates)
+                    //theseDates.Sort((x,y) => x.date.ToString("yyyyMMdd") - y.date.ToString("yyyyMMdd"));
+                    List<MainPage.MyDate> sortedDates = theseDates.OrderBy(x => x.date.ToString("yyyyMMdd")).ToList();
+                    foreach (MainPage.MyDate thisdate in sortedDates)
                     {
                         dateStrings.Add(thisdate.date.ToString("yyyy-MM-dd"));
                         lineStrings.Add(LineSource[thisdate.lineNumber]);
