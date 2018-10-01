@@ -32,6 +32,7 @@ namespace Quality_Inspection
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
         SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.WhiteSmoke);
         SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
+        SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
         CalendarViewDayItem newDay = new CalendarViewDayItem();
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };
@@ -61,9 +62,9 @@ namespace Quality_Inspection
                 List<Button> newList = new List<Button>();
                 buttonTracker.Add(newList);
             }
-            makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
             Cale.SetDisplayDate(DateTimeOffset.Now.Date);
             loadMaster();
+            makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
             DDD.Visibility = Visibility.Collapsed;
             
         }
@@ -115,6 +116,7 @@ namespace Quality_Inspection
             PartBox.Text = loadCheck.partName;
             LineBox.Text = loadCheck.lineName;
             ShiftBox.Text = ShiftSource[loadCheck.checkNumber];
+            NoteBox.Text = loadCheck.notes;
             if (loadCheck.sampleMatch)
             {
                 SampleCheck_true.IsChecked = true;
@@ -235,6 +237,10 @@ namespace Quality_Inspection
             if (partMasterList.lunchList == null) { partMasterList.lunchList = new string[15]; }
             if (partMasterList.morningList == null) { partMasterList.morningList = new string[15]; }
             if (partMasterList.secondList == null) { partMasterList.secondList = new string[15]; }
+            if (partMasterList.firstNotes == null) { partMasterList.firstNotes = new bool[15]; }
+            if (partMasterList.lunchNotes == null) { partMasterList.lunchNotes = new bool[15]; }
+            if (partMasterList.morningNotes == null) { partMasterList.morningNotes = new bool[15]; }
+            if (partMasterList.secondNotes == null) { partMasterList.secondNotes = new bool[15]; }
             buttonBob();
         }
 
@@ -255,6 +261,7 @@ namespace Quality_Inspection
                     thisButtonList[i].Content = "N/A";
                     thisButtonList[i].IsEnabled = false;
                 }
+                if (partMasterList.morningNotes[i]) { thisButtonList[i].Foreground = Red; }
                 i++;
             }
             thisButtonList = buttonTracker[1];
@@ -272,6 +279,7 @@ namespace Quality_Inspection
                     thisButtonList[i].Content = "N/A";
                     thisButtonList[i].IsEnabled = false;
                 }
+                if (partMasterList.firstNotes[i]) { thisButtonList[i].Foreground = Red; }
                 i++;
             }
             thisButtonList = buttonTracker[2];
@@ -289,6 +297,7 @@ namespace Quality_Inspection
                     thisButtonList[i].Content = "N/A";
                     thisButtonList[i].IsEnabled = false;
                 }
+                if (partMasterList.lunchNotes[i]) { thisButtonList[i].Foreground = Red; }
                 i++;
             }
             thisButtonList = buttonTracker[3];
@@ -306,6 +315,7 @@ namespace Quality_Inspection
                     thisButtonList[i].Content = "N/A";
                     thisButtonList[i].IsEnabled = false;
                 }
+                if (partMasterList.secondNotes[i]) { thisButtonList[i].Foreground = Red; }
                 i++;
             }
         }

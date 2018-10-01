@@ -11,6 +11,7 @@ using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System.Threading;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml;
@@ -32,11 +33,11 @@ namespace Quality_Inspection
     {
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };
-        SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);
-        SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
+        public SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);
+        public SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
         SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.White);
-        SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
+        public SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
         SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
         SolidColorBrush Orng = new SolidColorBrush(Windows.UI.Colors.Orange);
         SolidColorBrush Yellow = new SolidColorBrush(Windows.UI.Colors.Yellow);
@@ -50,6 +51,8 @@ namespace Quality_Inspection
         StorageFolder saveHere;
         const int FPS = 60;
 
+        List<PartTracker> PartSearcher = new List<PartTracker>(); //searching index
+
         DateTimeOffset beginTimeOfRecordedSession;
         DateTimeOffset endTimeOfRecordedSession;
         TimeSpan durationOfRecordedSession;
@@ -59,18 +62,35 @@ namespace Quality_Inspection
 
         InkStrokeBuilder strokeBuilder;
         IReadOnlyList<InkStroke> strokesToReplay;
-        
+
 
         InkStrokeContainer[] twoSigs = new InkStrokeContainer[2];
 
         List<DateTimeOffset> masterList = new List<DateTimeOffset>();
         PartMaster partMasterList = new PartMaster();
+
+        public class MyDate
+        {
+            public DateTimeOffset date { get; set; }
+            public int lineNumber { get; set; }
+        }
+        public class PartTracker
+        {
+            public string partName { get; set; }
+            public List<MyDate> dates { get; set; }
+        }
+
         public class PartMaster
         {
             public string[] morningList { get; set; }
             public string[] firstList { get; set; }
             public string[] lunchList { get; set; }
             public string[] secondList { get; set; }
+
+            public bool[] morningNotes { get; set; }
+            public bool[] firstNotes { get; set; }
+            public bool[] lunchNotes { get; set; }
+            public bool[] secondNotes { get; set; }
         }
 
         //List<bool[]> masterList = new List<bool[]>();
@@ -89,6 +109,7 @@ namespace Quality_Inspection
             public bool[] defectList { get; set; }
             public string[] sigPath { get; set; }
             public string[] initals { get; set; }
+            public string notes { get; set; }
         }
 
 
@@ -103,7 +124,7 @@ namespace Quality_Inspection
             newCheck.sigPath = new string[2];
             newCheck.initals = new string[2];
 
-            
+
 
             TimeSpan period = TimeSpan.FromSeconds(5);
 
@@ -160,10 +181,27 @@ namespace Quality_Inspection
             {
                 partMasterList = new PartMaster();
             }
-            if (partMasterList.firstList == null) {partMasterList.firstList = new string[15];}
+            try
+            {
+                String JsonFile = "PartSearch.json";
+                StorageFolder localFolder = KnownFolders.MusicLibrary;
+                StorageFile localFile = await localFolder.GetFileAsync(JsonFile);
+                String JsonString = await FileIO.ReadTextAsync(localFile);
+                PartSearcher = JsonConvert.DeserializeObject(JsonString, typeof(List<PartTracker>)) as List<PartTracker>;
+            }
+            catch
+            {
+                PartSearcher = new List<PartTracker>();
+            }
+
+            if (partMasterList.firstList == null) { partMasterList.firstList = new string[15]; }
             if (partMasterList.lunchList == null) { partMasterList.lunchList = new string[15]; }
             if (partMasterList.morningList == null) { partMasterList.morningList = new string[15]; }
             if (partMasterList.secondList == null) { partMasterList.secondList = new string[15]; }
+            if (partMasterList.firstNotes == null) { partMasterList.firstNotes = new bool[15]; }
+            if (partMasterList.lunchNotes == null) { partMasterList.lunchNotes = new bool[15]; }
+            if (partMasterList.morningNotes == null) { partMasterList.morningNotes = new bool[15]; }
+            if (partMasterList.secondNotes == null) { partMasterList.secondNotes = new bool[15]; }
         }
 
         private void DefectListSetup()
@@ -207,7 +245,7 @@ namespace Quality_Inspection
             if (whichBox)
             {
                 SampleCheck_false.IsChecked = false;
-                
+
             }
             else
             {
@@ -269,7 +307,7 @@ namespace Quality_Inspection
             {
                 DefectCheck_true.IsChecked = false;
                 DefectGrid.Background = LG;
-                foreach(CheckBox checkLister in DefectList)
+                foreach (CheckBox checkLister in DefectList)
                 {
                     checkLister.IsEnabled = false;
                 }
@@ -286,7 +324,7 @@ namespace Quality_Inspection
         }
         private async Task SaveSign1()
         {
-            string fileName = "TechSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem +"_" + ShiftBox.SelectedItem +  ".gif"; //+ DateTimeOffset.Now.ToString("yyyy_MM_dd_HH:MM") 
+            string fileName = "TechSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif"; //+ DateTimeOffset.Now.ToString("yyyy_MM_dd_HH:MM") 
 
             StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             Windows.Storage.CachedFileManager.DeferUpdates(newFile);
@@ -351,23 +389,64 @@ namespace Quality_Inspection
             newCheck.checkNumber = ShiftBox.SelectedIndex;
             string[] initials = { QT_Initials.Text, DS_Initials.Text };
             newCheck.initals = initials;
-            
+
             try { await SaveSign1(); } catch { }
             try { await SaveSign2(); } catch { }
-            if(!masterList.Contains(dateBox.Date.Date))
+            if (!masterList.Contains(dateBox.Date.Date))
             {
                 masterList.Add(dateBox.Date.Date);
             }
             if (ShiftBox.SelectedIndex == 0)
-            { partMasterList.morningList[LineBox.SelectedIndex] = PartBox.Text; }
+            {
+                partMasterList.morningList[LineBox.SelectedIndex] = PartBox.Text;
+                if (NoteBox.Text.Length > 0)
+                {
+                    partMasterList.morningNotes[LineBox.SelectedIndex] = true;
+                }
+                else
+                {
+                    partMasterList.morningNotes[LineBox.SelectedIndex] = false;
+                }
+            }
             else if (ShiftBox.SelectedIndex == 1)
-            { partMasterList.firstList[LineBox.SelectedIndex] = PartBox.Text; }
+            {
+                partMasterList.firstList[LineBox.SelectedIndex] = PartBox.Text;
+                if (NoteBox.Text.Length > 0)
+                {
+                    partMasterList.firstNotes[LineBox.SelectedIndex] = true;
+                }
+                else
+                {
+                    partMasterList.firstNotes[LineBox.SelectedIndex] = false;
+                }
+            }
             else if (ShiftBox.SelectedIndex == 2)
-            { partMasterList.lunchList[LineBox.SelectedIndex] = PartBox.Text; }
+            {
+                partMasterList.lunchList[LineBox.SelectedIndex] = PartBox.Text;
+                if (NoteBox.Text.Length > 0)
+                {
+                    partMasterList.lunchNotes[LineBox.SelectedIndex] = true;
+                }
+                else
+                {
+                    partMasterList.lunchNotes[LineBox.SelectedIndex] = false;
+                }
+            }
             else if (ShiftBox.SelectedIndex == 3)
-            { partMasterList.secondList[LineBox.SelectedIndex] = PartBox.Text; }
+            {
+                partMasterList.secondList[LineBox.SelectedIndex] = PartBox.Text;
+                if (NoteBox.Text.Length > 0)
+                {
+                    partMasterList.secondNotes[LineBox.SelectedIndex] = true;
+                }
+                else
+                {
+                    partMasterList.secondNotes[LineBox.SelectedIndex] = false;
+                }
+            }
 
             try { newCheck.defectList = DefectListMaker(); } catch { }
+            try { newCheck.notes = NoteBox.Text; } catch { }
 
 
             string json = JsonConvert.SerializeObject(newCheck);
@@ -384,7 +463,7 @@ namespace Quality_Inspection
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
 
 
-            
+
             StorageFolder rootFolder = KnownFolders.MusicLibrary;
             var projectFolderName = dateBox.Date.ToString("yyyy_MM_dd");
             StorageFolder projectFolder = await rootFolder.CreateFolderAsync(projectFolderName, CreationCollisionOption.OpenIfExists);
@@ -392,6 +471,7 @@ namespace Quality_Inspection
             fileName = "PartMaster_" + dateBox.Date.ToString("yyyy_MM_dd_") + ".json";
             newFile = await projectFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
+            PartSearchCreator();
             //try
             //{
             /*
@@ -402,21 +482,83 @@ namespace Quality_Inspection
            */
             this.Background = White;
             LightLeds();
+            NoteBox.Text = "";
             //QualityCheck newCheck = new QualityCheck();
             //newCheck.sampleMatch = 
         }
 
+        private async void PartSearchCreator()
+        {
+            string PartName = PartBox.Text;
+            bool isIn = false;
+            int i = 0;
+            MyDate newDate = new MyDate();
+            foreach(PartTracker thisTracker in PartSearcher)
+            {
+                if(thisTracker.partName == PartName)
+                {
+                    isIn = true;
+                    bool isInDate = false;
+                    foreach(MyDate dateSearch in thisTracker.dates)
+                    {
+                        if(dateSearch.date == dateBox.Date.Date)
+                        {
+                            isInDate = true;
+                        }
+                    }
+                    if(!isInDate)
+                    {
+                        newDate.date = dateBox.Date.Date;
+                        newDate.lineNumber = LineBox.SelectedIndex;
+                    }
+                    //this is my tracker.
+                }
+                i++;
+            }
+            if (!isIn)
+            {
+                PartTracker myTracker = new PartTracker();
+                List<MyDate> newDates = new List<MyDate>();
+                myTracker.partName = PartBox.Text;
+                newDate.lineNumber = LineBox.SelectedIndex;
+                newDate.date = dateBox.Date.Date;
+                newDates.Add(newDate);
+                myTracker.dates = newDates;
+                PartSearcher.Add(myTracker);
+            }
+            StorageFolder localFolder = KnownFolders.MusicLibrary;
+            String json = JsonConvert.SerializeObject(PartSearcher);
+            String fileName = "PartSearch.json";
+            StorageFile newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
+        }
+
         private void ClickView(object sender, PointerRoutedEventArgs e)
         {
-            ViewBorder.BorderBrush = SLB;
-            ViewBorder.Background = SB;
-            this.Frame.Navigate(typeof(ViewMaster), masterList);
+            Image pic = sender as Image;
+            Border bord = pic.Parent as Border;
+
+            bord.BorderBrush = SLB;
+            bord.Background = SB;
+            if (bord.Name == "ViewBorder")
+            {
+
+                this.Frame.Navigate(typeof(ViewMaster), masterList);
+
+            }
+            else if (bord.Name == "SearchBorder")
+            {
+                this.Frame.Navigate(typeof(Search), PartSearcher);
+            }
+
         }
 
         private void ClickUnview(object sender, PointerRoutedEventArgs e)
         {
-            ViewBorder.BorderBrush = SB;
-            ViewBorder.Background = LSB;
+            Image pic = sender as Image;
+            Border bord = pic.Parent as Border;
+            bord.BorderBrush = SB;
+            bord.Background = LSB;
         }
 
         private void dateChange(object sender, DatePickerValueChangedEventArgs e)
@@ -431,7 +573,7 @@ namespace Quality_Inspection
         }
 
         private void LightLeds()
-        { 
+        {
             S1.Fill = S2.Fill = S3.Fill = S4.Fill = White;
             int whichLine = LineBox.SelectedIndex;
             try
@@ -459,7 +601,7 @@ namespace Quality_Inspection
                     S3.Fill = Yellow;
                 }
             }
-            catch{ }
+            catch { }
 
             try
             {
@@ -476,6 +618,7 @@ namespace Quality_Inspection
         {
             loadChange();
         }
+
         private void loadChange()
         {
             if (isLoaded)
@@ -492,86 +635,70 @@ namespace Quality_Inspection
                 }
                 QualityCheck loadCheck = new QualityCheck();
             }
+        }
 
+        private void Typed(object sender, TextChangedEventArgs e)
+        {
+            Random rnd = new Random();
+            int R = rnd.Next(10, 255);
+            int G = rnd.Next(10, 255);
+            int B = rnd.Next(10, 255);
+            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+        }
 
-            /*
-            try { date = Cale.SelectedDates[0].ToString("yyyy_MM_dd"); }
-            catch { date = DateTimeOffset.Now.ToString("yyyy_MM_dd"); }
-            String name = "Sheet_" + date + "_" + LineSource[Convert.ToInt16(locate[0])] + "_" + ShiftSource[Convert.ToInt16(locate[1])] + ".json";
-            StorageFolder localFolder = KnownFolders.MusicLibrary;
-            StorageFolder dayFolder = await localFolder.GetFolderAsync(date);
-            shiftFolder = await dayFolder.GetFolderAsync(ShiftSource[Convert.ToInt16(locate[1])]);
-            StorageFile localFile = await shiftFolder.GetFileAsync(name);
-            String json = await FileIO.ReadTextAsync(localFile);
-            loadCheck = JsonConvert.DeserializeObject(json, typeof(MainPage.QualityCheck)) as MainPage.QualityCheck;
-            gg.Text = loadCheck.partName;
-            GGG.Visibility = Visibility.Collapsed;
-            DDD.Visibility = Visibility.Visible;
-            loadDate.Date = loadCheck.date;
-            Time.Text = loadCheck.date.ToString("hh:mm");
-            PartBox.Text = loadCheck.partName;
-            LineBox.Text = loadCheck.lineName;
-            ShiftBox.Text = ShiftSource[loadCheck.checkNumber];
-            if (loadCheck.sampleMatch)
-            {
-                SampleCheck_true.IsChecked = true;
-            }
-            else
-            {
-                SampleCheck_false.IsChecked = true;
-            }
-            if (loadCheck.lidMatch)
-            {
-                LidCheck_true.IsChecked = true;
-            }
-            else
-            {
-                LidCheck_false.IsChecked = true;
-            }
-            if (loadCheck.boxMatch)
-            {
-                PackageCheck_true.IsChecked = true;
-            }
-            else
-            {
-                PackageCheck_false.IsChecked = true;
-            }
-            try { QT_Initials.Text = loadCheck.initals[0]; } catch { }
-            try { DS_Initials.Text = loadCheck.initals[1]; } catch { }
+        private void Typed1(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            Random rnd = new Random();
+            int R = rnd.Next(10, 255);
+            int G = rnd.Next(10, 255);
+            int B = rnd.Next(10, 255);
+            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+        }
 
+        private void Typed2(TextBox sender, TextCompositionChangedEventArgs args)
+        {
+            Random rnd = new Random();
+            int R = rnd.Next(10, 255);
+            int G = rnd.Next(10, 255);
+            int B = rnd.Next(10, 255);
+            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+
+        }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            
+
+            base.OnNavigatedTo(e);
+            ViewBorder.BorderBrush = SB; SearchBorder.BorderBrush = SB;
+            ViewBorder.Background = LSB; SearchBorder.Background = LSB;
+        }
+
+        private async void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
             try
             {
-                localFile = await shiftFolder.GetFileAsync(loadCheck.sigPath[0]);
-                // User selects a file and picker returns a reference to the selected file.
-                if (localFile != null)
+                StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
+                String json = await FileIO.ReadTextAsync(newFile);
+                List<string> masterPartList = JsonConvert.DeserializeObject(json, typeof(List<String>)) as List<String>;
+                masterPartList.Sort();
+                if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
                 {
-                    // Open a file stream for reading.
-                    IRandomAccessStream stream = await localFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                    // Read from file.
-                    using (var inputStream = stream.GetInputStreamAt(0))
-                    {
-                        await inkyCanvas.InkPresenter.StrokeContainer.LoadAsync(stream);
-                    }
-                    stream.Dispose();
+                    List<string> suggestions = SearchControls(sender.Text);
+                    sender.ItemsSource = suggestions;
+                }
+                List<string> SearchControls(string query)
+                {
+                    var suggestions = new List<string>();
+                    suggestions = masterPartList.Where(x => x.StartsWith(query)).ToList();
+                    return suggestions;
                 }
             }
             catch { }
-            try
-            {
-                localFile = await shiftFolder.GetFileAsync(loadCheck.sigPath[1]);
-                if (localFile != null)
-                {
-                    // Open a file stream for reading.
-                    IRandomAccessStream stream = await localFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                    // Read from file.
-                    using (var inputStream = stream.GetInputStreamAt(0))
-                    {
-                        await inkyCanvasDS.InkPresenter.StrokeContainer.LoadAsync(stream);
-                    }
-                    stream.Dispose();
-                }
-            }
-            catch { }*/
+        }
+        private void ChoseThis(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem;
         }
     }
 }

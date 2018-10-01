@@ -62,8 +62,12 @@
 
             </Grid>
         </Border>
-        <Border x:Name="DDD" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
+        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
             <Grid HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" Width="1024">
+                <RelativePanel HorizontalAlignment="Left" Height="128" Margin="49,387,0,0" VerticalAlignment="Top" Width="333">
+                    <TextBox x:Name="NoteBox" HorizontalAlignment="Left" Margin="57,0,0,0" Text="" VerticalAlignment="Center" Width="276" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxWidth="300" TextWrapping="Wrap" Height="128" IsReadOnly="True"/>
+                    <TextBlock HorizontalAlignment="Left" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                </RelativePanel>
                 <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1024" Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="513*"/>
