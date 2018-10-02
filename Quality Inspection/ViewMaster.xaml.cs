@@ -141,9 +141,31 @@ namespace Quality_Inspection
             {
                 PackageCheck_false.IsChecked = true;
             }
+            if (loadCheck.defects)
+            {
+                DefectCheck_true.IsChecked = true;
+            }
+            else
+            {
+                DefectCheck_false.IsChecked = true;
+            }
             try { QT_Initials.Text = loadCheck.initals[0]; } catch{ }
             try { DS_Initials.Text = loadCheck.initals[1]; } catch{ }
-            
+            if (loadCheck.defectList[0]) { D0.IsChecked = true; }
+            if (loadCheck.defectList[1]) { D1.IsChecked = true; }
+            if (loadCheck.defectList[2]) { D2.IsChecked = true; }
+            if (loadCheck.defectList[3]) { D3.IsChecked = true; }
+            if (loadCheck.defectList[4]) { D4.IsChecked = true; }
+            if (loadCheck.defectList[5]) { D5.IsChecked = true; }
+            if (loadCheck.defectList[6]) { D6.IsChecked = true; }
+            if (loadCheck.defectList[7]) { D7.IsChecked = true; }
+            if (loadCheck.defectList[8]) { D8.IsChecked = true; }
+            if (loadCheck.defectList[9]) { D9.IsChecked = true; }
+            if (loadCheck.defectList[10]) { D10.IsChecked = true; }
+            if (loadCheck.defectList[11]) { D11.IsChecked = true; }
+
+
+
             try {
                 localFile = await shiftFolder.GetFileAsync(loadCheck.sigPath[0]); 
                 // User selects a file and picker returns a reference to the selected file.

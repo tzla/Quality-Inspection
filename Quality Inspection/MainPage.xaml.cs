@@ -27,13 +27,17 @@ using Windows.UI.Xaml.Navigation;
 namespace Quality_Inspection
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Main page/entry point for program. 
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
-        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };
-        public SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);
+        //these two lists allow for using index location for saving data
+        ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };//line name list 
+        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//Shift list 
+
+
+
+        public SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);//pre-loaded colors for UI
         public SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
         SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.White);
@@ -43,60 +47,59 @@ namespace Quality_Inspection
         SolidColorBrush Yellow = new SolidColorBrush(Windows.UI.Colors.Yellow);
         SolidColorBrush Green = new SolidColorBrush(Windows.UI.Colors.Green);
 
+        List<CheckBox> DefectList = new List<CheckBox>();//list of checked defects
+        QualityCheck newCheck = new QualityCheck();//individual quality report for specific line and shift
+        StorageFolder saveHere; //tracks the location for saving data
 
-        //private MainPage rootPage = MainPage.Current;
+        List<PartTracker> PartSearcher = new List<PartTracker>(); //used to create index file for search purposes
 
-        List<CheckBox> DefectList = new List<CheckBox>();
-        QualityCheck newCheck = new QualityCheck();
-        StorageFolder saveHere;
-        const int FPS = 60;
+        InkStrokeContainer[] twoSigs = new InkStrokeContainer[2];//stores the two signatures 
 
-        List<PartTracker> PartSearcher = new List<PartTracker>(); //searching index
-
-        DateTimeOffset beginTimeOfRecordedSession;
-        DateTimeOffset endTimeOfRecordedSession;
-        TimeSpan durationOfRecordedSession;
-        DateTime beginTimeOfReplay;
-
-        DispatcherTimer inkReplayTimer;
-
-        InkStrokeBuilder strokeBuilder;
-        IReadOnlyList<InkStroke> strokesToReplay;
+        List<DateTimeOffset> masterList = new List<DateTimeOffset>();//creates a master list of active days for calender search
+        PartMaster partMasterList = new PartMaster();//indexes individual quality reports by line number,date, and shift
 
 
-        InkStrokeContainer[] twoSigs = new InkStrokeContainer[2];
-
-        List<DateTimeOffset> masterList = new List<DateTimeOffset>();
-        PartMaster partMasterList = new PartMaster();
-
+        /// <summary>
+        /// Tracks the line a specific part ran on for run day
+        /// </summary>
         public class MyDate
         {
             public DateTimeOffset date { get; set; }
             public int lineNumber { get; set; }
         }
-        public class PartTracker
+
+        /// <summary>
+        /// Indexes each individual part for search. 
+        /// </summary>
+        public class PartTracker 
         {
             public string partName { get; set; }
             public List<MyDate> dates { get; set; }
         }
 
+        /// <summary>
+        /// Indexes part name and line with corresponding notes for each day. 
+        /// </summary>
         public class PartMaster
         {
-            public string[] morningList { get; set; }
+            public string[] morningList { get; set; } //lists of part names corresponding to line number
             public string[] firstList { get; set; }
             public string[] lunchList { get; set; }
             public string[] secondList { get; set; }
 
-            public bool[] morningNotes { get; set; }
+            public bool[] morningNotes { get; set; } //corresponding quality notes 
             public bool[] firstNotes { get; set; }
             public bool[] lunchNotes { get; set; }
             public bool[] secondNotes { get; set; }
         }
+        
+        bool isLoaded = false; //tracks if program is loaded 
 
-        //List<bool[]> masterList = new List<bool[]>();
-        bool[] thisList;
-        bool isLoaded = false;
-        public class QualityCheck
+
+        /// <summary>
+        /// This is the individual quality report for a single line for a single block of time
+        /// </summary>
+        public class QualityCheck 
         {
             public bool sampleMatch { get; set; }
             public bool boxMatch { get; set; }
@@ -112,23 +115,24 @@ namespace Quality_Inspection
             public string notes { get; set; }
         }
 
-
+        /// <summary>
+        /// Home/Data Entry Page
+        /// </summary>
         public MainPage()
         {
-            this.InitializeComponent();
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            LineBox.ItemsSource = LineSource;
-            LineBox.SelectedIndex = 0;
-            ShiftBox.ItemsSource = ShiftSource;
-            ShiftBox.SelectedIndex = 0;
-            newCheck.sigPath = new string[2];
-            newCheck.initals = new string[2];
+            this.InitializeComponent();//loads UI
+            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled; //caches page for reloading when navigating to different pages
+            LineBox.ItemsSource = LineSource; //links the Line Number box with the list of line names
+            LineBox.SelectedIndex = 0; //sets default line to 1
+            ShiftBox.ItemsSource = ShiftSource; //links shift box to the list of shift names
+            ShiftBox.SelectedIndex = 0; //selects morning as default
+            newCheck.sigPath = new string[2]; //initializes list of file location paths
+            newCheck.initals = new string[2]; //initializes list of initials for sign off
 
+            TimeSpan period = TimeSpan.FromSeconds(5);//creates a timer to update clock every 5 seconds
 
-
-            TimeSpan period = TimeSpan.FromSeconds(5);
-
-            ThreadPoolTimer PeriodicTimer = ThreadPoolTimer.CreatePeriodicTimer((source) =>
+            Time.Text = DateTime.Now.ToString("hh:mm");//loads clock on startup
+            ThreadPoolTimer PeriodicTimer = ThreadPoolTimer.CreatePeriodicTimer((source) => //run the timer and update
             {
 
                 Dispatcher.RunAsync(CoreDispatcherPriority.High,
@@ -139,26 +143,17 @@ namespace Quality_Inspection
 
             }, period);
 
-
-
-
-            InkDrawingAttributes drawingAttributes = new InkDrawingAttributes();
-            drawingAttributes.Color = Windows.UI.Colors.Black;
-            drawingAttributes.IgnorePressure = false;
-            drawingAttributes.FitToCurve = true;
-            SetupMasterList();
-            DefectListSetup();
-            isLoaded = true;
+            SetupMasterList();//load data and setup lists
+            DefectListSetup();//create list of the defect boxes
+            isLoaded = true;//loaded flag is on. prevents unneccessary actions
         }
 
+        /// <summary>
+        /// Loads Data for lists OR creates new list if data is unavailable. 
+        /// </summary>
         private async void SetupMasterList()
         {
-            thisList = new bool[15];
-            for (int i = 0; i < 15; i++)
-            {
-                thisList[i] = false;
-            }
-            try
+            try //loads master date list
             {
                 String JsonFile = "MasterTracker.json";
                 StorageFolder localFolder = KnownFolders.MusicLibrary;
@@ -167,7 +162,8 @@ namespace Quality_Inspection
                 masterList = JsonConvert.DeserializeObject(JsonString, typeof(List<DateTimeOffset>)) as List<DateTimeOffset>;
             }
             catch { masterList = new List<DateTimeOffset>(); }
-            try
+
+            try //loads the part indexer for the chosen day
             {
                 String JsonFile = "PartMaster_" + dateBox.Date.ToString("yyyy_MM_dd_") + ".json";
                 StorageFolder localFolder = KnownFolders.MusicLibrary;
@@ -181,7 +177,8 @@ namespace Quality_Inspection
             {
                 partMasterList = new PartMaster();
             }
-            try
+
+            try //loads the part tracking index
             {
                 String JsonFile = "PartSearch.json";
                 StorageFolder localFolder = KnownFolders.MusicLibrary;
@@ -194,6 +191,7 @@ namespace Quality_Inspection
                 PartSearcher = new List<PartTracker>();
             }
 
+            //if lists dont load, instantiates the daily lists 
             if (partMasterList.firstList == null) { partMasterList.firstList = new string[15]; }
             if (partMasterList.lunchList == null) { partMasterList.lunchList = new string[15]; }
             if (partMasterList.morningList == null) { partMasterList.morningList = new string[15]; }
@@ -204,48 +202,57 @@ namespace Quality_Inspection
             if (partMasterList.secondNotes == null) { partMasterList.secondNotes = new bool[15]; }
         }
 
+        /// <summary>
+        /// Creates a list of the defect checkboxes for easy access
+        /// </summary>
         private void DefectListSetup()
         {
             DefectList.Add(D0); DefectList.Add(D1); DefectList.Add(D2); DefectList.Add(D3); DefectList.Add(D4); DefectList.Add(D5); DefectList.Add(D6); DefectList.Add(D7);
             DefectList.Add(D8); DefectList.Add(D9); DefectList.Add(D10); DefectList.Add(D11);
         }
 
-        private async void DoThis(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Saves the QA tech signature to sig list
+        /// </summary>v
+        private async void SaveSig(object sender, RoutedEventArgs e)
         {
             SignPopup TechSign = new SignPopup();
             ContentDialogResult result = await TechSign.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
                 InkStrokeContainer thisStrokes = TechSign.returnSig();
-                //inkyCanvas.InkPresenter.StrokeContainer.
                 inkyCanvas.InkPresenter.StrokeContainer = thisStrokes;
                 twoSigs[0] = thisStrokes;
             }
         }
 
-        private async void DoThisDS(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Saves Diesetter signature to sig list
+        /// </summary>
+        private async void SaveSigDS(object sender, RoutedEventArgs e)
         {
             SignPopup TechSign = new SignPopup();
             ContentDialogResult result = await TechSign.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
                 InkStrokeContainer thisStrokes = TechSign.returnSig();
-                //inkyCanvas.InkPresenter.StrokeContainer.
                 inkyCanvasDS.InkPresenter.StrokeContainer = thisStrokes;
                 twoSigs[1] = thisStrokes;
             }
         }
 
+        /// <summary>
+        /// Processes the sample match checkboxes
+        /// </summary>
         private void SampleCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
             string boxName = thisBox.Name;
             string[] splitName = boxName.Split('_');
             bool whichBox = Convert.ToBoolean(splitName[1]);
-            if (whichBox)
+            if (whichBox) //makes one box checked at a time
             {
                 SampleCheck_false.IsChecked = false;
-
             }
             else
             {
@@ -254,13 +261,16 @@ namespace Quality_Inspection
             newCheck.sampleMatch = whichBox;
         }
 
+        /// <summary>
+        /// Processes the match package checkboxes
+        /// </summary>
         private void PackageCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
             string boxName = thisBox.Name;
             string[] splitName = boxName.Split('_');
             bool whichBox = Convert.ToBoolean(splitName[1]);
-            if (whichBox)
+            if (whichBox) //makes one box checked at a time
             {
                 PackageCheck_false.IsChecked = false;
             }
@@ -271,13 +281,16 @@ namespace Quality_Inspection
             newCheck.boxMatch = whichBox;
         }
 
+        /// <summary>
+        /// Processes the lid fit checkboxes
+        /// </summary>
         private void LidCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
             string boxName = thisBox.Name;
             string[] splitName = boxName.Split('_');
             bool whichBox = Convert.ToBoolean(splitName[1]);
-            if (whichBox)
+            if (whichBox) //makes one box checked at a time
             {
                 LidCheck_false.IsChecked = false;
             }
@@ -288,13 +301,16 @@ namespace Quality_Inspection
             newCheck.lidMatch = whichBox;
         }
 
+        /// <summary>
+        /// Processes the defect checkboxes
+        /// </summary>
         private void DefectCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
             string boxName = thisBox.Name;
             string[] splitName = boxName.Split('_');
             bool whichBox = Convert.ToBoolean(splitName[1]);
-            if (whichBox)
+            if (whichBox) //makes one box checked at a time
             {
                 DefectCheck_false.IsChecked = false;
                 DefectGrid.Background = White;
@@ -310,10 +326,15 @@ namespace Quality_Inspection
                 foreach (CheckBox checkLister in DefectList)
                 {
                     checkLister.IsEnabled = false;
+                    checkLister.IsChecked = false; //clears defects if part is defect free
                 }
             }
             newCheck.defects = whichBox;
         }
+
+        /// <summary>
+        /// Create/Open the appropriate folder for saving/loading data
+        /// </summary>
         private async Task newFolders()
         {
             StorageFolder rootFolder = KnownFolders.MusicLibrary;
@@ -322,9 +343,13 @@ namespace Quality_Inspection
             projectFolderName = ShiftBox.SelectedItem as string;
             saveHere = await projectFolder.CreateFolderAsync(projectFolderName, CreationCollisionOption.OpenIfExists);
         }
+
+        /// <summary>
+        /// Processes the signature for QA Tech
+        /// </summary>
         private async Task SaveSign1()
         {
-            string fileName = "TechSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif"; //+ DateTimeOffset.Now.ToString("yyyy_MM_dd_HH:MM") 
+            string fileName = "TechSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif";
 
             StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             Windows.Storage.CachedFileManager.DeferUpdates(newFile);
@@ -345,9 +370,12 @@ namespace Quality_Inspection
             //return newFile;
         }
 
+        /// <summary>
+        /// Processes the signature for the diesetter
+        /// </summary>
         private async Task SaveSign2()
         {
-            string fileName = "DSSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif"; //+ DateTimeOffset.Now.ToString("yyyy_MM_dd_HH:MM") 
+            string fileName = "DSSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif";
 
             StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             Windows.Storage.CachedFileManager.DeferUpdates(newFile);
@@ -365,38 +393,45 @@ namespace Quality_Inspection
             Windows.Storage.Provider.FileUpdateStatus status =
                 await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(newFile);
             newCheck.sigPath[1] = fileName;
-            //return newFile;
         }
+
+        /// <summary>
+        /// Processes the defect checkboxes for saving data
+        /// </summary>
         private bool[] DefectListMaker()
         {
             bool[] list = new bool[15];
-            list[0] = Convert.ToBoolean(D0.IsChecked); list[1] = Convert.ToBoolean(D1.IsChecked); list[2] = Convert.ToBoolean(D2.IsChecked);
-            list[3] = Convert.ToBoolean(D3.IsChecked); list[4] = Convert.ToBoolean(D4.IsChecked); list[5] = Convert.ToBoolean(D2.IsChecked);
-            list[6] = Convert.ToBoolean(D6.IsChecked); list[7] = Convert.ToBoolean(D7.IsChecked); list[8] = Convert.ToBoolean(D2.IsChecked);
-            list[9] = Convert.ToBoolean(D9.IsChecked); list[10] = Convert.ToBoolean(D10.IsChecked); list[11] = Convert.ToBoolean(D2.IsChecked);
-
-
+            int i = 0;
+            foreach (CheckBox thisBox in DefectList)
+            {
+                list[i] = Convert.ToBoolean(thisBox.IsChecked);
+                i++;
+            }
             return list;
         }
 
-        private async void BoopBoop(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Processes and Saves the entered data
+        /// </summary>
+        private async void ConfirmData(object sender, RoutedEventArgs e)
         {
             await newFolders();
             newCheck.lineName = LineBox.SelectedItem as string;
-            thisList[LineBox.SelectedIndex] = true;
             newCheck.partName = PartBox.Text;
             newCheck.date = DateTimeOffset.Now.LocalDateTime;
             newCheck.checkNumber = ShiftBox.SelectedIndex;
             string[] initials = { QT_Initials.Text, DS_Initials.Text };
             newCheck.initals = initials;
-
+            
             try { await SaveSign1(); } catch { }
             try { await SaveSign2(); } catch { }
-            if (!masterList.Contains(dateBox.Date.Date))
+
+            if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
             {
                 masterList.Add(dateBox.Date.Date);
             }
-            if (ShiftBox.SelectedIndex == 0)
+
+            if (ShiftBox.SelectedIndex == 0) 
             {
                 partMasterList.morningList[LineBox.SelectedIndex] = PartBox.Text;
                 if (NoteBox.Text.Length > 0)
@@ -407,7 +442,7 @@ namespace Quality_Inspection
                 {
                     partMasterList.morningNotes[LineBox.SelectedIndex] = false;
                 }
-            }
+            }//saves the appropriate data for the daily part tracker
             else if (ShiftBox.SelectedIndex == 1)
             {
                 partMasterList.firstList[LineBox.SelectedIndex] = PartBox.Text;
@@ -445,7 +480,8 @@ namespace Quality_Inspection
                 }
             }
 
-            try { newCheck.defectList = DefectListMaker(); } catch { }
+            newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
+            try { newCheck.defectList = DefectListMaker(); } catch { } 
             try { newCheck.notes = NoteBox.Text; } catch { }
 
 
@@ -454,15 +490,11 @@ namespace Quality_Inspection
             StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
 
-
-
             StorageFolder localFolder = KnownFolders.MusicLibrary;
             json = JsonConvert.SerializeObject(masterList);
             fileName = "MasterTracker.json";
             newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-
-
 
             StorageFolder rootFolder = KnownFolders.MusicLibrary;
             var projectFolderName = dateBox.Date.ToString("yyyy_MM_dd");
@@ -471,22 +503,16 @@ namespace Quality_Inspection
             fileName = "PartMaster_" + dateBox.Date.ToString("yyyy_MM_dd_") + ".json";
             newFile = await projectFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-            PartSearchCreator();
-            //try
-            //{
-            /*
-               // Open a file stream for writing.
+            PartSearchCreator(); 
 
-           }
-           catch { }
-           */
             this.Background = White;
-            LightLeds();
+            LightLeds(); //adds visual cue for shift already saved
             NoteBox.Text = "";
-            //QualityCheck newCheck = new QualityCheck();
-            //newCheck.sampleMatch = 
         }
 
+        /// <summary>
+        /// Indexes parts for search feature
+        /// </summary>
         private async void PartSearchCreator()
         {
             string PartName = PartBox.Text;
@@ -511,7 +537,6 @@ namespace Quality_Inspection
                         newDate.date = dateBox.Date.Date;
                         newDate.lineNumber = LineBox.SelectedIndex;
                     }
-                    //this is my tracker.
                 }
                 i++;
             }
@@ -533,26 +558,28 @@ namespace Quality_Inspection
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
         }
 
+        /// <summary>
+        /// Processes Icon Button Presses for navigating pages
+        /// </summary>
         private void ClickView(object sender, PointerRoutedEventArgs e)
         {
             Image pic = sender as Image;
             Border bord = pic.Parent as Border;
-
             bord.BorderBrush = SLB;
             bord.Background = SB;
             if (bord.Name == "ViewBorder")
             {
-
                 this.Frame.Navigate(typeof(ViewMaster), masterList);
-
             }
             else if (bord.Name == "SearchBorder")
             {
                 this.Frame.Navigate(typeof(Search), PartSearcher);
             }
-
         }
 
+        /// <summary>
+        /// Resets Icon Buttons to default state
+        /// </summary>
         private void ClickUnview(object sender, PointerRoutedEventArgs e)
         {
             Image pic = sender as Image;
@@ -561,17 +588,26 @@ namespace Quality_Inspection
             bord.Background = LSB;
         }
 
-        private void dateChange(object sender, DatePickerValueChangedEventArgs e)
+        /// <summary>
+        /// Reloads data if a different date is selected. 
+        /// </summary>
+        private void DateChange(object sender, DatePickerValueChangedEventArgs e)
         {
             SetupMasterList();
             DefectListSetup();
         }
 
+        /// <summary>
+        /// Visual Cue processor for changing line box
+        /// </summary>
         private void LoadShiftLED(object sender, SelectionChangedEventArgs e)
         {
             LightLeds();
         }
 
+        /// <summary>
+        /// Creates the visual cues for which shifts are already entered,
+        /// </summary>
         private void LightLeds()
         {
             S1.Fill = S2.Fill = S3.Fill = S4.Fill = White;
@@ -614,11 +650,17 @@ namespace Quality_Inspection
             loadChange();
         }
 
+        /// <summary>
+        /// Handles changing the shift box
+        /// </summary>
         private void ShiftChange(object sender, SelectionChangedEventArgs e)
         {
             loadChange();
         }
 
+        /// <summary>
+        /// If line/shift/date is changed, create/clear individual quality check
+        /// </summary>
         private void loadChange()
         {
             if (isLoaded)
@@ -626,55 +668,35 @@ namespace Quality_Inspection
                 int shiftCheck = ShiftBox.SelectedIndex;
                 int whichLine = LineBox.SelectedIndex;
                 string date = dateBox.Date.Date.ToString("yyyy_MM_dd");
+
+                /*  FUTURE FEATURE: LOAD PREVIOUS DATA INTO MAIN PAGE 
                 if (shiftCheck == 0)
                 {
                     if (partMasterList.morningList[whichLine] != null)
                     {
                         String name = "Sheet_" + date + "_" + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".json";
                     }
-                }
+                }*/
                 QualityCheck loadCheck = new QualityCheck();
             }
         }
 
-        private void Typed(object sender, TextChangedEventArgs e)
-        {
-            Random rnd = new Random();
-            int R = rnd.Next(10, 255);
-            int G = rnd.Next(10, 255);
-            int B = rnd.Next(10, 255);
-            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
-        }
-
-        private void Typed1(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            Random rnd = new Random();
-            int R = rnd.Next(10, 255);
-            int G = rnd.Next(10, 255);
-            int B = rnd.Next(10, 255);
-            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
-        }
-
-        private void Typed2(TextBox sender, TextCompositionChangedEventArgs args)
-        {
-            Random rnd = new Random();
-            int R = rnd.Next(10, 255);
-            int G = rnd.Next(10, 255);
-            int B = rnd.Next(10, 255);
-            NoteBox.Foreground = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
-
-        }
+        /// <summary>
+        /// Handles the return to this page by resetting icon buttons
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            
-
             base.OnNavigatedTo(e);
             ViewBorder.BorderBrush = SB; SearchBorder.BorderBrush = SB;
             ViewBorder.Background = LSB; SearchBorder.Background = LSB;
         }
 
+        /// <summary>
+        /// Handles the autosuggestion for the part name
+        /// </summary>
         private async void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            sender.Text = sender.Text.ToUpper();
             try
             {
                 StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
@@ -695,6 +717,10 @@ namespace Quality_Inspection
             }
             catch { }
         }
+
+        /// <summary>
+        /// Handles the autosuggestion selection
+        /// </summary>
         private void ChoseThis(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             var selectedItem = args.SelectedItem.ToString();

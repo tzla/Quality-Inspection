@@ -52,6 +52,7 @@ namespace Quality_Inspection
 
         private void AutoTextChange(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            sender.Text = sender.Text.ToUpper();
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 List<string> suggestions = SearchControls(sender.Text);
