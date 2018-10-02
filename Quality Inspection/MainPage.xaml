@@ -15,7 +15,7 @@
                 <ColumnDefinition Width="511*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1053">
-                <DatePicker x:Name="dateBox" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" DateChanged="DateChange"/>
+                <DatePicker x:Name="dateBox" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" DateChanged="DateChange"  />
                 <TextBlock x:Name="Time" Text="00:00" FontSize="18" Margin="15,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <TextBlock HorizontalAlignment="Center" Margin="35,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <AutoSuggestBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" PlaceholderText="Part #" TextChanged="PartLookupTextChanged" SuggestionChosen="ChoseThis"/>

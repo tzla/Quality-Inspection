@@ -161,7 +161,11 @@ namespace Quality_Inspection
                 String JsonString = await FileIO.ReadTextAsync(localFile);
                 masterList = JsonConvert.DeserializeObject(JsonString, typeof(List<DateTimeOffset>)) as List<DateTimeOffset>;
             }
-            catch { masterList = new List<DateTimeOffset>(); }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                masterList = new List<DateTimeOffset>();
+            }
 
             try //loads the part indexer for the chosen day
             {
@@ -173,8 +177,9 @@ namespace Quality_Inspection
                 String JsonString = await FileIO.ReadTextAsync(localFile);
                 partMasterList = JsonConvert.DeserializeObject(JsonString, typeof(PartMaster)) as PartMaster;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 partMasterList = new PartMaster();
             }
 
@@ -186,8 +191,9 @@ namespace Quality_Inspection
                 String JsonString = await FileIO.ReadTextAsync(localFile);
                 PartSearcher = JsonConvert.DeserializeObject(JsonString, typeof(List<PartTracker>)) as List<PartTracker>;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 PartSearcher = new List<PartTracker>();
             }
 
@@ -213,7 +219,7 @@ namespace Quality_Inspection
 
         /// <summary>
         /// Saves the QA tech signature to sig list
-        /// </summary>v
+        /// </summary>
         private async void SaveSig(object sender, RoutedEventArgs e)
         {
             SignPopup TechSign = new SignPopup();
@@ -423,8 +429,8 @@ namespace Quality_Inspection
             string[] initials = { QT_Initials.Text, DS_Initials.Text };
             newCheck.initals = initials;
             
-            try { await SaveSign1(); } catch { }
-            try { await SaveSign2(); } catch { }
+            try { await SaveSign1(); } catch (Exception ee) { Console.WriteLine(ee); }
+            try { await SaveSign2(); } catch (Exception ee) { Console.WriteLine(ee); }
 
             if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
             {
@@ -484,6 +490,7 @@ namespace Quality_Inspection
             try { newCheck.defectList = DefectListMaker(); } catch { } 
             try { newCheck.notes = NoteBox.Text; } catch { }
 
+            MasterPartCheck(PartBox.Text);
 
             string json = JsonConvert.SerializeObject(newCheck);
             string fileName = "Sheet_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".json";
@@ -508,6 +515,23 @@ namespace Quality_Inspection
             this.Background = White;
             LightLeds(); //adds visual cue for shift already saved
             NoteBox.Text = "";
+        }
+
+        private async void MasterPartCheck(string partName)
+        {
+            StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
+            String json = await FileIO.ReadTextAsync(newFile);
+            List<string> masterPartList = JsonConvert.DeserializeObject(json, typeof(List<String>)) as List<String>;
+            if (!masterPartList.Contains(partName))
+            {
+                masterPartList.Add(partName);
+                StorageFolder localFolder = KnownFolders.MusicLibrary;
+                json = JsonConvert.SerializeObject(masterPartList);
+                string fileName = "MasterParts.json";
+                newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
+            }
+
         }
 
         /// <summary>

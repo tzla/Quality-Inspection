@@ -31,10 +31,7 @@ namespace Quality_Inspection
                 Windows.UI.Core.CoreInputDeviceTypes.Pen |
                 Windows.UI.Core.CoreInputDeviceTypes.Touch;
 
-            // Listen for button click to initiate save.
-            btnSave.Click += btnSave_Click;
-            // Listen for button click to initiate load.
-            btnLoad.Click += btnLoad_Click;
+           
             // Listen for button click to clear ink canvas.
             btnClear.Click += btnClear_Click;
         }

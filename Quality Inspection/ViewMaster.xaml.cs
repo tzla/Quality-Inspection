@@ -23,36 +23,45 @@ using Windows.UI.Xaml.Navigation;
 namespace Quality_Inspection
 {
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Can review past reports via calender selection
     /// </summary>
     public sealed partial class ViewMaster : Page
     {
-        SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);
+        SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue); //preset colors
         SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
         SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.WhiteSmoke);
         SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
         SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
-        CalendarViewDayItem newDay = new CalendarViewDayItem();
-        ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
-        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };
-        List<DateTimeOffset> masterList;
-        List<List<Button>> buttonTracker = new List<List<Button>>();
-        MainPage.QualityCheck loadCheck = new MainPage.QualityCheck();
-        MainPage.PartMaster partMasterList = new MainPage.PartMaster();
-        string EditFilePath;
 
-        List<string> MasterPartList = new List<string>();
+        CalendarViewDayItem newDay = new CalendarViewDayItem();//allows for disabling of unworked days
+
+        ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
+        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//source lists
+
+        List<DateTimeOffset> masterList; //master date list for enabling worked days
+        List<List<Button>> buttonTracker = new List<List<Button>>(); //list of generated buttons
+        MainPage.QualityCheck loadCheck = new MainPage.QualityCheck(); //the selected quality report
+        MainPage.PartMaster partMasterList = new MainPage.PartMaster(); //list used to populate buttons
+
+        List<string> MasterPartList = new List<string>(); //!!!! unsure why this is here
 
         StorageFolder shiftFolder;
-        bool load = false;
+
+        bool load = false; //two load flags
         bool load2 = false;
+
+        /// <summary>
+        /// Initialize component
+        /// </summary>
         public ViewMaster()
         {
-            this.InitializeComponent();
-               
+            this.InitializeComponent();     
         }
 
+        /// <summary>
+        /// Processes the navigation from MainPage
+        /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
