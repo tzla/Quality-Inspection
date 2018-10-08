@@ -38,8 +38,8 @@
             <CheckBox x:Name="LidCheck_false" Content="N/A" HorizontalAlignment="Left" Margin="322,144,0,0" VerticalAlignment="Top" Click="LidCheck"/>
             <CheckBox x:Name="DefectCheck_true" Content="Does Pan Have Defects" HorizontalAlignment="Left" Margin="45,180,0,0" VerticalAlignment="Top" Click="DefectCheck"/>
             <CheckBox x:Name="DefectCheck_false" Content="No" HorizontalAlignment="Left" Margin="322,180,0,0" VerticalAlignment="Top" Click="DefectCheck"/>
-            <Button Content="QA Tech Signiture" HorizontalAlignment="Left" Margin="534,179,0,0" VerticalAlignment="Top" Click="SaveSig" Grid.ColumnSpan="2"/>
-            <Grid x:Name="DefectGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,231,0,0" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Height="120" Background="LightGray">
+            <Button Content="QA Tech Signiture" HorizontalAlignment="Left" Margin="534,179,0,0" VerticalAlignment="Top" Click="SaveSig" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open QA Signature Window"/>
+            <Grid x:Name="DefectGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,231,0,0" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Height="120" Background="LightGray" ToolTipService.ToolTip="Check Defect Box To Enable">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="150" />
                     <ColumnDefinition Width="150" />
@@ -64,14 +64,14 @@
                 <CheckBox x:Name="D10" Content="Wrinkled Edges" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2" Tag="Defect"/>
                 <CheckBox x:Name="D11" Content="Cracks" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Grid.RowSpan="1" Tag="Defect" />
             </Grid>
-            <Button Content="Diesetter Signiture" HorizontalAlignment="Left" Margin="534,247,0,0" VerticalAlignment="Top" Click="SaveSigDS" Width="139" Padding="3,4,3,4" Grid.ColumnSpan="2"/>
-            <Button Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="37.2,319,0,0" VerticalAlignment="Top" Click="ConfirmData"/>
+            <Button Content="Diesetter Signiture" HorizontalAlignment="Left" Margin="534,247,0,0" VerticalAlignment="Top" Click="SaveSigDS" Width="139" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open DS Signature Window"/>
+            <Button Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="37.2,319,0,0" VerticalAlignment="Top" Click="ConfirmData" ToolTipService.ToolTip="Save Current Sheet"/>
 
             <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
-                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
+                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Calender Search"/>
             </Border>
             <Border x:Name="SearchBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,247,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
-                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/mager.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
+                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/mager.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Part Search"/>
             </Border>
         </Grid>
         <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>

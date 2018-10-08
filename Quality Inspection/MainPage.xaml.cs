@@ -307,6 +307,12 @@ namespace Quality_Inspection
             newCheck.lidMatch = whichBox;
         }
 
+        private void SQLSaver()
+        {
+
+        }
+
+
         /// <summary>
         /// Processes the defect checkboxes
         /// </summary>
@@ -320,6 +326,8 @@ namespace Quality_Inspection
             {
                 DefectCheck_false.IsChecked = false;
                 DefectGrid.Background = White;
+                ToolTip toolTip = new ToolTip();
+                ToolTipService.SetToolTip(DefectGrid, null);
                 foreach (CheckBox checkLister in DefectList)
                 {
                     checkLister.IsEnabled = true;
@@ -329,6 +337,9 @@ namespace Quality_Inspection
             {
                 DefectCheck_true.IsChecked = false;
                 DefectGrid.Background = LG;
+                ToolTip toolTip = new ToolTip();
+                toolTip.Content = "Check Defect Box To Enable";
+                ToolTipService.SetToolTip(DefectGrid, toolTip);
                 foreach (CheckBox checkLister in DefectList)
                 {
                     checkLister.IsEnabled = false;
