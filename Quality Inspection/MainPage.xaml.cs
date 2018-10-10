@@ -465,28 +465,10 @@ namespace Quality_Inspection
             newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
             try { newCheck.defectList = DefectListMaker(); } catch { } 
             try { newCheck.notes = NoteBox.Text; } catch { }
-
-            MasterPartCheck(PartBox.Text);
-
-
+            
             String sqlString = sqlMaker(newCheck, dateBox.Date.Date.ToString("yyyy-MM-dd"));
             SQLSaver(sqlString);
-            
-            string json = JsonConvert.SerializeObject(newCheck);
-            string fileName = "Sheet_" + dateBox.Date.ToString("yyyy_MM_dd_") + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".json";
-            StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-
-            StorageFolder localFolder = KnownFolders.MusicLibrary;
-            json = JsonConvert.SerializeObject(masterList);
-            fileName = "MasterTracker.json";
-            newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-
-            
-            PartSearchCreator(); 
-
-
+                    
             this.Background = White;
             LightLeds(); //adds visual cue for shift already saved
             NoteBox.Text = "";
@@ -576,75 +558,6 @@ namespace Quality_Inspection
 
         }
             
-
-        private async void MasterPartCheck(string partName)
-        {
-            try
-            {
-                StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
-                String json = await FileIO.ReadTextAsync(newFile);
-                List<string> masterPartList = JsonConvert.DeserializeObject(json, typeof(List<String>)) as List<String>;
-                if (!masterPartList.Contains(partName))
-                {
-                    masterPartList.Add(partName);
-                    StorageFolder localFolder = KnownFolders.MusicLibrary;
-                    json = JsonConvert.SerializeObject(masterPartList);
-                    string fileName = "MasterParts.json";
-                    newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-                    await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-                }
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Indexes parts for search feature
-        /// </summary>
-        private async void PartSearchCreator()
-        {
-            string PartName = PartBox.Text;
-            bool isIn = false;
-            int i = 0;
-            MyDate newDate = new MyDate();
-            foreach(PartTracker thisTracker in PartSearcher)
-            {
-                if(thisTracker.partName == PartName)
-                {
-                    isIn = true;
-                    bool isInDate = false;
-                    foreach(MyDate dateSearch in thisTracker.dates)
-                    {
-                        if(dateSearch.date == dateBox.Date.Date)
-                        {
-                            isInDate = true;
-                        }
-                    }
-                    if(!isInDate)
-                    {
-                        newDate.date = dateBox.Date.Date;
-                        newDate.lineNumber = LineBox.SelectedIndex;
-                    }
-                }
-                i++;
-            }
-            if (!isIn)
-            {
-                PartTracker myTracker = new PartTracker();
-                List<MyDate> newDates = new List<MyDate>();
-                myTracker.partName = PartBox.Text;
-                newDate.lineNumber = LineBox.SelectedIndex;
-                newDate.date = dateBox.Date.Date;
-                newDates.Add(newDate);
-                myTracker.dates = newDates;
-                PartSearcher.Add(myTracker);
-            }
-            StorageFolder localFolder = KnownFolders.MusicLibrary;
-            String json = JsonConvert.SerializeObject(PartSearcher);
-            String fileName = "PartSearch.json";
-            StorageFile newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
-        }
-
         /// <summary>
         /// Processes Icon Button Presses for navigating pages
         /// </summary>
@@ -683,6 +596,7 @@ namespace Quality_Inspection
             bord.BorderBrush = SB;
             bord.Background = LSB;
         }
+
         /// <summary>
         /// Reloads data if a different date is selected. 
         /// </summary>
@@ -735,10 +649,10 @@ namespace Quality_Inspection
                 }
 
             }
-
-
             return output;
         }
+
+
         /// <summary>
         /// Creates the visual cues for which shifts are already entered,
         /// </summary>
@@ -756,9 +670,6 @@ namespace Quality_Inspection
             if (LedList[6]) { S7.Fill = Indg; }
             if (LedList[7]) { S8.Fill = Pink; }
             if (LedList[8]) { S9.Fill = Brown; }
-
-
-
             loadChange();
         }
 
@@ -806,15 +717,34 @@ namespace Quality_Inspection
         /// <summary>
         /// Handles the autosuggestion for the part name
         /// </summary>
-        private async void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            List<String> masterPartList = new List<string>();
             sender.Text = sender.Text.ToUpper();
+            String thisString = "SELECT DISTINCT PartNumber FROM QualityCheck ORDER BY PartNumber;";
+            using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = thisString;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                String getter = reader.GetString(0).TrimEnd();
+                                masterPartList.Add(getter);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
             try
             {
-                StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
-                String json = await FileIO.ReadTextAsync(newFile);
-                List<string> masterPartList = JsonConvert.DeserializeObject(json, typeof(List<String>)) as List<String>;
-                masterPartList.Sort();
+                
                 if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
                 {
                     List<string> suggestions = SearchControls(sender.Text);
