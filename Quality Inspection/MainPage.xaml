@@ -9,25 +9,32 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1081" Margin="0,0,0,0">
+        <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1242" Margin="0,0,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="513*"/>
                 <ColumnDefinition Width="511*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1053">
+            <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1190">
                 <DatePicker x:Name="dateBox" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" DateChanged="DateChange"  />
                 <TextBlock x:Name="Time" Text="00:00" FontSize="18" Margin="15,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock HorizontalAlignment="Center" Margin="35,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <AutoSuggestBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" PlaceholderText="Part #" TextChanged="PartLookupTextChanged" SuggestionChosen="ChoseThis"/>
-                <TextBlock HorizontalAlignment="Center" Margin="35,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <ComboBox x:Name="LineBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" SelectionChanged="LoadShiftLED" />
-                <TextBlock HorizontalAlignment="Center" Margin="35,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Hour:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <ComboBox x:Name="ShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" SelectionChanged="ShiftChange" />
-                <StackPanel HorizontalAlignment="Center" Height="10" VerticalAlignment="Top" Width="40" Margin="-85,40,0,0" Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <ComboBox x:Name="RealShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" SelectionChanged="ShiftChange" />
+                <StackPanel HorizontalAlignment="Center" Height="10" VerticalAlignment="Top" Width="75" Margin="-65,40,0,0" Orientation="Horizontal">
                     <Ellipse x:Name="S1" HorizontalAlignment="Left" Height="8" VerticalAlignment="Center" Width="8"/>
                     <Ellipse x:Name="S2" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
                     <Ellipse x:Name="S3" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
                     <Ellipse x:Name="S4" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S5" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S6" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S7" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S8" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S9" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
                 </StackPanel>
             </StackPanel>
             <CheckBox x:Name="SampleCheck_true" Content="Production Pan Matches Sample" HorizontalAlignment="Left" Margin="45,72,0,0" VerticalAlignment="Top" Checked="SampleCheck"/>
@@ -65,7 +72,7 @@
                 <CheckBox x:Name="D11" Content="Cracks" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Grid.RowSpan="1" Tag="Defect" />
             </Grid>
             <Button Content="Diesetter Signiture" HorizontalAlignment="Left" Margin="534,247,0,0" VerticalAlignment="Top" Click="SaveSigDS" Width="139" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open DS Signature Window"/>
-            <Button Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="37.2,319,0,0" VerticalAlignment="Top" Click="ConfirmData" ToolTipService.ToolTip="Save Current Sheet"/>
+            <Button Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="425.2,360,0,0" VerticalAlignment="Top" Click="ConfirmData" ToolTipService.ToolTip="Save Current Sheet"/>
 
             <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Calender Search"/>
@@ -73,6 +80,7 @@
             <Border x:Name="SearchBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,247,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/mager.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Part Search"/>
             </Border>
+            <Button Content="Supervisor Signiture" HorizontalAlignment="Left" Margin="532,314,0,0" VerticalAlignment="Top" Click="SaveSigSup" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open Supervisor Signature Window"/>
         </Grid>
         <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
         <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="801,247,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
@@ -107,6 +115,19 @@
 
 
         </RelativePanel>
+        <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,261,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
+            <Grid.RenderTransform>
+                <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
+            </Grid.RenderTransform>
+            <InkCanvas x:Name="inkyCanvasSup" HorizontalAlignment="Left" VerticalAlignment="Top" Width="298" Height="131.2" Margin="66,-4,0,0">
+                <InkCanvas.RenderTransform>
+                    <CompositeTransform ScaleX="1" ScaleY="1"/>
+                </InkCanvas.RenderTransform>
+            </InkCanvas>
+
+
+        </Grid>
+        <TextBox x:Name="Sup_Initials" HorizontalAlignment="Left" Margin="801,310,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
 
 
     </Grid>

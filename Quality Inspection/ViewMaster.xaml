@@ -11,14 +11,19 @@
     <Grid>
         <CalendarView x:Name="Cale" HorizontalAlignment="Left" Margin="37,38,0,0" VerticalAlignment="Top" CalendarViewDayItemChanging="CalendarView_CalendarViewDayItemChanging" SelectedDatesChanged="hola"/>
         <TextBox x:Name="gg" HorizontalAlignment="Left" Margin="150,399,0,0" Text="TextBox" VerticalAlignment="Top"/>
-        <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
-            <Grid x:Name="Grud" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0" Width="749">
+        <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
+            <Grid x:Name="Grud" HorizontalAlignment="Left" VerticalAlignment="Center" Width="850">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
+                    <ColumnDefinition Width="85" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
@@ -55,14 +60,18 @@
                 <TextBlock HorizontalAlignment="Center" Text="Line 9" VerticalAlignment="Center" Grid.Row="14"/>
                 <TextBlock HorizontalAlignment="Center" Text="Line 10" VerticalAlignment="Center" Grid.Row="15"/>
 
-                <TextBlock HorizontalAlignment="Center" Text="Morning" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="Auto" />
-                <TextBlock HorizontalAlignment="Center" Text="First Break" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0" Grid.Column="2" Height="Auto"/>
-                <TextBlock HorizontalAlignment="Center" Text="Lunch" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="3" Height="Auto"/>
-                <TextBlock HorizontalAlignment="Center" Text="Second Break" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="4" Height="Auto"/>
-
+                <TextBlock HorizontalAlignment="Center" Text="Start Up" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="Auto" />
+                <TextBlock HorizontalAlignment="Center" Text="Hour 1" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0" Grid.Column="2" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="First Break" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="3" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Hour 3" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="4" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Hour 4" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="5" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Lunch" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="6" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Hour 6" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="7" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="2nd Break" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="8" Height="Auto"/>
+                <TextBlock HorizontalAlignment="Center" Text="Hour 8" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="9" Height="Auto"/>
             </Grid>
         </Border>
-        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
+        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
             <Grid HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" Width="1024">
                 <RelativePanel HorizontalAlignment="Left" Height="128" Margin="49,387,0,0" VerticalAlignment="Top" Width="333">
                     <TextBox x:Name="NoteBox" HorizontalAlignment="Left" Margin="57,0,0,0" Text="" VerticalAlignment="Center" Width="276" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxWidth="300" TextWrapping="Wrap" Height="128" IsReadOnly="True"/>

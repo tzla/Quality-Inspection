@@ -17,7 +17,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
+using System.Data.SqlClient;
+using System.Globalization;
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Quality_Inspection
@@ -37,9 +38,10 @@ namespace Quality_Inspection
         CalendarViewDayItem newDay = new CalendarViewDayItem();//allows for disabling of unworked days
 
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
+        ObservableCollection<string> newShiftSource = new ObservableCollection<string> {"Shift Start","Hour 1","First Break","Hour 3","Hour 4","After Lunch", "Hour 6", "Second Break", "Hour 8" };
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//source lists
 
-        List<DateTimeOffset> masterList; //master date list for enabling worked days
+        List<DateTimeOffset> masterList = new List<DateTimeOffset>(); //master date list for enabling worked days
         List<List<Button>> buttonTracker = new List<List<Button>>(); //list of generated buttons
         MainPage.QualityCheck loadCheck = new MainPage.QualityCheck(); //the selected quality report
         MainPage.PartMaster partMasterList = new MainPage.PartMaster(); //list used to populate buttons
@@ -51,6 +53,18 @@ namespace Quality_Inspection
         bool load = false; //two load flags
         bool load2 = false;
 
+        List<GetCheck> loadChecks = new List<GetCheck>();
+
+        public class GetCheck
+        {
+            public String partNumber { get; set; }
+            public int checkNumber { get; set; }
+            public int checkShift { get; set; }
+            public int lineNumber { get; set; }
+            public String[] SpecialID { get; set; }
+        }
+
+
         /// <summary>
         /// Initialize component
         /// </summary>
@@ -59,23 +73,103 @@ namespace Quality_Inspection
             this.InitializeComponent();     
         }
 
+
         /// <summary>
         /// Processes the navigation from MainPage
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            masterList = e.Parameter as List<DateTimeOffset>;
-            for(int i =0;i<4;i++)
+            this.InitializeComponent();
+
+            SQL_MasterDate();
+            for(int i =0;i<9;i++)
             {
                 List<Button> newList = new List<Button>();
                 buttonTracker.Add(newList);
             }
             Cale.SetDisplayDate(DateTimeOffset.Now.Date);
+            SQL_Loader(DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"));
+            ButtonSetUp();
             loadMaster();
-            makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
+            
             DDD.Visibility = Visibility.Collapsed;
             
+
+        }
+        private void SQL_MasterDate()
+        {
+            String output = "SELECT DISTINCT CheckDate FROM QualityCheck ORDER BY CheckDate;";
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                            //string[] parts = reader.GetString(0).Split('-');
+                            //DateTime dt = new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+                                try
+                                {
+                                    DateTimeOffset dayer = reader.GetDateTime(0);
+                                    
+                                    masterList.Add(dayer);
+                                }
+                                catch(Exception ee)
+                                {
+                                    Console.WriteLine(ee.ToString());
+                                }
+                                
+                                
+                            }
+                        }
+
+                }
+            }
+            
+        }
+        private void SQL_Loader(String date)
+        {
+            String output = "SELECT PartNumber,CheckNo,CheckShift,LineNumber,SpecialCheck FROM QualityCheck";
+            output += " WHERE (CheckDate = '";
+            output += date + "');";
+
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                GetCheck loadCheck = new GetCheck();
+                                loadCheck.partNumber = reader.GetString(0);
+                                loadCheck.checkNumber = (int)reader.GetByte(1); ;
+                                loadCheck.checkShift = (int)reader.GetByte(2);
+                                loadCheck.lineNumber = (int)reader.GetInt32(3);
+                                loadCheck.SpecialID = reader.GetString(4).Split('-');
+                                loadChecks.Add(loadCheck);
+                            }
+                        }
+                    }
+                    catch(Exception ee) { String error = ee.ToString(); }
+                }
+
+            }
+        }
+
+        private void ButtonSetUp()
+        {
+            makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
+            makeButtons(5); makeButtons(6); makeButtons(7); makeButtons(8); makeButtons(9);
         }
 
         private void makeButtons(int col)
@@ -87,14 +181,14 @@ namespace Quality_Inspection
                 newButton.HorizontalAlignment = HorizontalAlignment.Center;
                 newButton.VerticalAlignment = VerticalAlignment.Center;
                 newButton.Height = 26;
-                newButton.Width = 100;
-                newButton.FontSize = 12;
+                newButton.Width = 75;
+                newButton.FontSize = 8.5;
                 newButton.Name = i.ToString() + "_" + (col-1).ToString();
                 newButton.IsEnabled = false;
                 Grud.Children.Add(newButton);
                 Grid.SetRow(newButton, i+1);
                 Grid.SetColumn(newButton, col);
-                newButton.Content = i.ToString() + " Button";
+                newButton.Content = "N/A";
                 buttonCol.Add(newButton);
                 newButton.Click += buttonClick;
             }
@@ -110,6 +204,8 @@ namespace Quality_Inspection
             String date;
             try { date = Cale.SelectedDates[0].ToString("yyyy_MM_dd"); }
             catch { date = DateTimeOffset.Now.ToString("yyyy_MM_dd"); }
+
+
             String name = "Sheet_" + date + "_" + LineSource[Convert.ToInt16(locate[0])] + "_" + ShiftSource[Convert.ToInt16(locate[1])] + ".json";
             StorageFolder localFolder = KnownFolders.MusicLibrary;
             StorageFolder dayFolder = await localFolder.GetFolderAsync(date);
@@ -123,7 +219,7 @@ namespace Quality_Inspection
             loadDate.Date = loadCheck.date;
             Time.Text = loadCheck.date.ToString("hh:mm");
             PartBox.Text = loadCheck.partName;
-            LineBox.Text = loadCheck.lineName;
+            LineBox.Text = loadCheck.lineName.ToString() ;
             ShiftBox.Text = ShiftSource[loadCheck.checkNumber];
             NoteBox.Text = loadCheck.notes;
             if (loadCheck.sampleMatch)
@@ -227,127 +323,20 @@ namespace Quality_Inspection
 
         private async void loadMaster()
         {
-            try
-            {
-                StorageFile newFile = await KnownFolders.MusicLibrary.GetFileAsync("MasterParts.json");
-                String json = await FileIO.ReadTextAsync(newFile);
-                MasterPartList = JsonConvert.DeserializeObject(json, typeof(List<String>)) as List<String>;
-            }
-            catch { MasterPartList = new List<string>(); }
-            if (MasterPartList == null)
-            {
-                MasterPartList = new List<string>();
-            }
-            String JsonFile;
-            String projectFolderName;
-            try
-            {
-                if(!load2)
-                {
-                    JsonFile = "PartMaster_" + DateTimeOffset.Now.ToString("yyyy_MM_dd_") + ".json";
-                    projectFolderName = DateTimeOffset.Now.ToString("yyyy_MM_dd");
-                    load2 = true;
-                }
-                else
-                {
-                    JsonFile = "PartMaster_" + Cale.SelectedDates[0].ToString("yyyy_MM_dd_") + ".json";
-                    projectFolderName = Cale.SelectedDates[0].ToString("yyyy_MM_dd");
-                }
-                gg.Text = projectFolderName;
-                StorageFolder localFolder = KnownFolders.MusicLibrary;
-                StorageFolder projectFolder = await localFolder.GetFolderAsync(projectFolderName);
-                StorageFile localFile = await projectFolder.GetFileAsync(JsonFile);
-                String JsonString = await FileIO.ReadTextAsync(localFile);
-                partMasterList = JsonConvert.DeserializeObject(JsonString, typeof(MainPage.PartMaster)) as MainPage.PartMaster;
-            }
-            catch
-            {
-                partMasterList = new MainPage.PartMaster();
-            }
-            if (partMasterList.firstList == null) { partMasterList.firstList = new string[15]; }
-            if (partMasterList.lunchList == null) { partMasterList.lunchList = new string[15]; }
-            if (partMasterList.morningList == null) { partMasterList.morningList = new string[15]; }
-            if (partMasterList.secondList == null) { partMasterList.secondList = new string[15]; }
-            if (partMasterList.firstNotes == null) { partMasterList.firstNotes = new bool[15]; }
-            if (partMasterList.lunchNotes == null) { partMasterList.lunchNotes = new bool[15]; }
-            if (partMasterList.morningNotes == null) { partMasterList.morningNotes = new bool[15]; }
-            if (partMasterList.secondNotes == null) { partMasterList.secondNotes = new bool[15]; }
             buttonBob();
         }
 
         private async void buttonBob()
         {
-            int i = 0;
-            List<Button> thisButtonList = buttonTracker[0];
-            foreach (String thisName in partMasterList.morningList)
+            foreach (GetCheck thisCheck in loadChecks)
             {
-
-                if (thisName != null)
-                {
-                    thisButtonList[i].Content = thisName;
-                    thisButtonList[i].IsEnabled = true;
-                }
-                else
-                {
-                    thisButtonList[i].Content = "N/A";
-                    thisButtonList[i].IsEnabled = false;
-                }
-                if (partMasterList.morningNotes[i]) { thisButtonList[i].Foreground = Red; }
-                i++;
-            }
-            thisButtonList = buttonTracker[1];
-            i = 0;
-            foreach (String thisName in partMasterList.firstList)
-            {
-
-                if (thisName != null)
-                {
-                    thisButtonList[i].Content = thisName;
-                    thisButtonList[i].IsEnabled = true;
-                }
-                else
-                {
-                    thisButtonList[i].Content = "N/A";
-                    thisButtonList[i].IsEnabled = false;
-                }
-                if (partMasterList.firstNotes[i]) { thisButtonList[i].Foreground = Red; }
-                i++;
-            }
-            thisButtonList = buttonTracker[2];
-            i = 0;
-            foreach (String thisName in partMasterList.lunchList)
-            {
-
-                if (thisName != null)
-                {
-                    thisButtonList[i].Content = thisName;
-                    thisButtonList[i].IsEnabled = true;
-                }
-                else
-                {
-                    thisButtonList[i].Content = "N/A";
-                    thisButtonList[i].IsEnabled = false;
-                }
-                if (partMasterList.lunchNotes[i]) { thisButtonList[i].Foreground = Red; }
-                i++;
-            }
-            thisButtonList = buttonTracker[3];
-            i = 0;
-            foreach (String thisName in partMasterList.secondList)
-            {
-
-                if (thisName != null)
-                {
-                    thisButtonList[i].Content = thisName;
-                    thisButtonList[i].IsEnabled = true;
-                }
-                else
-                {
-                    thisButtonList[i].Content = "N/A";
-                    thisButtonList[i].IsEnabled = false;
-                }
-                if (partMasterList.secondNotes[i]) { thisButtonList[i].Foreground = Red; }
-                i++;
+                int col = Convert.ToInt16(thisCheck.SpecialID[4]);
+                int row = Convert.ToInt16(thisCheck.SpecialID[5]);
+                String content = thisCheck.partNumber;
+                List<Button> thisButtonList = buttonTracker[col];
+                Button myButton = thisButtonList[row];
+                myButton.Content = content;
+                myButton.IsEnabled = true; 
             }
         }
 
@@ -380,74 +369,38 @@ namespace Quality_Inspection
             else
             {
                 args.Item.Background = new SolidColorBrush(Windows.UI.Colors.Aquamarine);
-                try
-                {
-                    String JsonFile = "PartMaster_" + args.Item.Date.Date.ToString("yyyy_MM_dd") + ".json";
-                    StorageFolder localFolder = KnownFolders.MusicLibrary;
-                    var projectFolderName = DateTimeOffset.Now.ToString("yyyy_MM_dd");
-                    StorageFolder projectFolder = await localFolder.GetFolderAsync(projectFolderName);
-                    StorageFile localFile = await projectFolder.GetFileAsync(JsonFile);
-                    String JsonString = await FileIO.ReadTextAsync(localFile);
-                    partMasterList = JsonConvert.DeserializeObject(JsonString, typeof(MainPage.PartMaster)) as MainPage.PartMaster;
-                    makeButtons(1);
-                    
-                }
-                catch { }
+               
             }
         }
         private async Task saveMaster()
         {
-            string json = JsonConvert.SerializeObject(MasterPartList);
-            string fileName = "MasterParts.json";
-            StorageFile newFile = await KnownFolders.MusicLibrary.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
         }
 
+        private void ClearButtons()
+        {
+           foreach(List<Button> thisCol in buttonTracker)
+            {
+                foreach(Button thisButton in thisCol)
+                {
+                    Grud.Children.Remove(thisButton);
+                }
+            }
+        }
         private async void hola(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
         {
-            try { gg.Text = args.AddedDates[0].ToString(); } catch { }
-            
-                foreach (string part in partMasterList.firstList)
-                {
-                    if (!MasterPartList.Contains(part) && part != null)
-                    {
-                        MasterPartList.Add(part);
-                    }
-                }
-            
-            try
+            //this.Background = Red;
+            String chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd");
+            loadChecks.Clear();
+            SQL_Loader(chooseDate);
+            ClearButtons();
+            buttonTracker.Clear();
+            for (int i = 0; i < 9; i++)
             {
-                foreach (String part in partMasterList.morningList)
-                {
-                    if (!MasterPartList.Contains(part) && part != null)
-                    {
-                        MasterPartList.Add(part);
-                    }
-                }
-            }catch{ }
-            try
-            {
-                foreach (String part in partMasterList.lunchList)
-                {
-                    if (!MasterPartList.Contains(part) && part != null)
-                    {
-                        MasterPartList.Add(part);
-                    }
-                }
+                List<Button> newList = new List<Button>();
+                buttonTracker.Add(newList);
             }
-            catch { }
-            try
-            {
-                foreach (String part in partMasterList.secondList)
-                {
-                    if (!MasterPartList.Contains(part) && part != null)
-                    {
-                        MasterPartList.Add(part);
-                    }
-                }
-            }
-            catch { }
-            await saveMaster();
+            ButtonSetUp();
+
 
             loadMaster();
             
