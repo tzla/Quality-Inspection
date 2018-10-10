@@ -74,13 +74,16 @@
             <Button Content="Diesetter Signiture" HorizontalAlignment="Left" Margin="534,247,0,0" VerticalAlignment="Top" Click="SaveSigDS" Width="139" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open DS Signature Window"/>
             <Button Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="425.2,360,0,0" VerticalAlignment="Top" Click="ConfirmData" ToolTipService.ToolTip="Save Current Sheet"/>
 
-            <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+            <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="423.6,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Calender Search"/>
             </Border>
-            <Border x:Name="SearchBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="401.2,247,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+            <Border x:Name="SearchBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="423.6,247,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/mager.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview" ToolTipService.ToolTip="Go To Part Search"/>
             </Border>
             <Button Content="Supervisor Signiture" HorizontalAlignment="Left" Margin="532,314,0,0" VerticalAlignment="Top" Click="SaveSigSup" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open Supervisor Signature Window"/>
+            <Border x:Name="SaveBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="286.6,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerPressed="ConfirmData" PointerReleased="ClickUnSave" ToolTipService.ToolTip="Save Current Sheet"/>
+            </Border>
         </Grid>
         <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
         <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="801,247,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>

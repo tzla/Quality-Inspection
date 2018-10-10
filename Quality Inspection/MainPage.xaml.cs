@@ -32,12 +32,10 @@ namespace Quality_Inspection
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //these two lists allow for using index location for saving data
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };//line name list 
-        SqlConnection conn;
-       //ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//Shift list 
-        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Shift Start", "Hour 1", "First Break", "Hour 3", "Hour 4", "After Lunch", "Hour 6", "Second Break", "Hour 8" };
-        ObservableCollection<string> RealShiftSource = new ObservableCollection<string> { "1st", "2nd", "3rd" };
+        SqlConnection conn;  //database connection item
+        ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Shift Start", "Hour 1", "First Break", "Hour 3", "Hour 4", "After Lunch", "Hour 6", "Second Break", "Hour 8" };//check times
+        ObservableCollection<string> RealShiftSource = new ObservableCollection<string> { "1st", "2nd", "3rd" };//list of shifts
 
 
 
@@ -47,7 +45,7 @@ namespace Quality_Inspection
         SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.White);
         public SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
 
-        SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
+        SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red); //colors for check indicators
         SolidColorBrush Orng = new SolidColorBrush(Windows.UI.Colors.Orange);
         SolidColorBrush Yellow = new SolidColorBrush(Windows.UI.Colors.Yellow);
         SolidColorBrush Green = new SolidColorBrush(Windows.UI.Colors.Green);
@@ -66,7 +64,7 @@ namespace Quality_Inspection
         InkStrokeContainer[] twoSigs = new InkStrokeContainer[3];//stores the two signatures 
 
         List<DateTimeOffset> masterList = new List<DateTimeOffset>();//creates a master list of active days for calender search
-        PartMaster partMasterList = new PartMaster();//indexes individual quality reports by line number,date, and shift
+        //PartMaster partMasterList = new PartMaster();//indexes individual quality reports by line number,date, and shift
 
 
         /// <summary>
@@ -155,8 +153,6 @@ namespace Quality_Inspection
                     });
 
             }, period);
-
-            SetupMasterList();//load data and setup lists
             DefectListSetup();//create list of the defect boxes
             isLoaded = true;//loaded flag is on. prevents unneccessary actions
         }
@@ -164,63 +160,6 @@ namespace Quality_Inspection
         /// <summary>
         /// Loads Data for lists OR creates new list if data is unavailable. 
         /// </summary>
-        private async void SetupMasterList()
-        {
-            try //loads master date list
-            {
-                String JsonFile = "MasterTracker.json";
-                StorageFolder localFolder = KnownFolders.MusicLibrary;
-                StorageFile localFile = await localFolder.GetFileAsync(JsonFile);
-                String JsonString = await FileIO.ReadTextAsync(localFile);
-                masterList = JsonConvert.DeserializeObject(JsonString, typeof(List<DateTimeOffset>)) as List<DateTimeOffset>;
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-                masterList = new List<DateTimeOffset>();
-            }
-
-            try //loads the part indexer for the chosen day
-            {
-                String JsonFile = "PartMaster_" + dateBox.Date.ToString("yyyy_MM_dd_") + ".json";
-                StorageFolder localFolder = KnownFolders.MusicLibrary;
-                var projectFolderName = dateBox.Date.ToString("yyyy_MM_dd");
-                StorageFolder projectFolder = await localFolder.GetFolderAsync(projectFolderName);
-                StorageFile localFile = await projectFolder.GetFileAsync(JsonFile);
-                String JsonString = await FileIO.ReadTextAsync(localFile);
-                partMasterList = JsonConvert.DeserializeObject(JsonString, typeof(PartMaster)) as PartMaster;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                partMasterList = new PartMaster();
-            }
-
-            try //loads the part tracking index
-            {
-                String JsonFile = "PartSearch.json";
-                StorageFolder localFolder = KnownFolders.MusicLibrary;
-                StorageFile localFile = await localFolder.GetFileAsync(JsonFile);
-                String JsonString = await FileIO.ReadTextAsync(localFile);
-                PartSearcher = JsonConvert.DeserializeObject(JsonString, typeof(List<PartTracker>)) as List<PartTracker>;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                PartSearcher = new List<PartTracker>();
-            }
-
-            //if lists dont load, instantiates the daily lists 
-
-            if (partMasterList.firstList == null) { partMasterList.firstList = new string[15]; }
-            if (partMasterList.lunchList == null) { partMasterList.lunchList = new string[15]; }
-            if (partMasterList.morningList == null) { partMasterList.morningList = new string[15]; }
-            if (partMasterList.secondList == null) { partMasterList.secondList = new string[15]; }
-            if (partMasterList.firstNotes == null) { partMasterList.firstNotes = new bool[15]; }
-            if (partMasterList.lunchNotes == null) { partMasterList.lunchNotes = new bool[15]; }
-            if (partMasterList.morningNotes == null) { partMasterList.morningNotes = new bool[15]; }
-            if (partMasterList.secondNotes == null) { partMasterList.secondNotes = new bool[15]; }
-        }
 
         /// <summary>
         /// Creates a list of the defect checkboxes for easy access
@@ -485,7 +424,7 @@ namespace Quality_Inspection
         /// </summary>
         private bool[] DefectListMaker()
         {
-            bool[] list = new bool[15];
+            bool[] list = new bool[12];
             int i = 0;
             foreach (CheckBox thisBox in DefectList)
             {
@@ -500,6 +439,10 @@ namespace Quality_Inspection
         /// </summary>
         private async void ConfirmData(object sender, RoutedEventArgs e)
         {
+            Image pic = sender as Image;
+            Border bord = pic.Parent as Border;
+            bord.BorderBrush = SLB;
+            bord.Background = SB;
             await newFolders();
             newCheck.lineName = LineBox.SelectedIndex;
             newCheck.partName = PartBox.Text;
@@ -517,56 +460,7 @@ namespace Quality_Inspection
             {
                 masterList.Add(dateBox.Date.Date);
             }
-            /*
-            if (ShiftBox.SelectedIndex == 0) 
-            {
-                partMasterList.morningList[LineBox.SelectedIndex] = PartBox.Text;
-                if (NoteBox.Text.Length > 0)
-                {
-                    partMasterList.morningNotes[LineBox.SelectedIndex] = true;
-                }
-                else
-                {
-                    partMasterList.morningNotes[LineBox.SelectedIndex] = false;
-                }
-            }//saves the appropriate data for the daily part tracker
-            else if (ShiftBox.SelectedIndex == 1)
-            {
-                partMasterList.firstList[LineBox.SelectedIndex] = PartBox.Text;
-                if (NoteBox.Text.Length > 0)
-                {
-                    partMasterList.firstNotes[LineBox.SelectedIndex] = true;
-                }
-                else
-                {
-                    partMasterList.firstNotes[LineBox.SelectedIndex] = false;
-                }
-            }
-            else if (ShiftBox.SelectedIndex == 2)
-            {
-                partMasterList.lunchList[LineBox.SelectedIndex] = PartBox.Text;
-                if (NoteBox.Text.Length > 0)
-                {
-                    partMasterList.lunchNotes[LineBox.SelectedIndex] = true;
-                }
-                else
-                {
-                    partMasterList.lunchNotes[LineBox.SelectedIndex] = false;
-                }
-            }
-            else if (ShiftBox.SelectedIndex == 3)
-            {
-                partMasterList.secondList[LineBox.SelectedIndex] = PartBox.Text;
-                if (NoteBox.Text.Length > 0)
-                {
-                    partMasterList.secondNotes[LineBox.SelectedIndex] = true;
-                }
-                else
-                {
-                    partMasterList.secondNotes[LineBox.SelectedIndex] = false;
-                }
-            }
-            */
+            
 
             newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
             try { newCheck.defectList = DefectListMaker(); } catch { } 
@@ -589,13 +483,7 @@ namespace Quality_Inspection
             newFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
 
-            StorageFolder rootFolder = KnownFolders.MusicLibrary;
-            var projectFolderName = dateBox.Date.ToString("yyyy_MM_dd");
-            StorageFolder projectFolder = await rootFolder.CreateFolderAsync(projectFolderName, CreationCollisionOption.OpenIfExists);
-            json = JsonConvert.SerializeObject(partMasterList);
-            fileName = "PartMaster_" + dateBox.Date.ToString("yyyy_MM_dd_") + ".json";
-            newFile = await projectFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            await Windows.Storage.FileIO.WriteTextAsync(newFile, json);
+            
             PartSearchCreator(); 
 
 
@@ -643,9 +531,51 @@ namespace Quality_Inspection
             try { output += thisCheck.notes + "','"; } catch { }
             output += dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + checkNo + "-" + (thisCheck.lineName).ToString();
             output += "'); ";
+
+                String specialID = "'" + dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + checkNo + "-" + (thisCheck.lineName).ToString() + "'";
+                SQLDefectMaker(specialID,thisCheck);
+
             //output = "INSERT INTO QualityCheck(CheckDate, CheckTime, CheckNo, SampleMatch, CheckShift, LineNumber, PartNumber) Values('2018-10-04', '12:24:10', 0, 2, 0, 3, 'WM88-173');";
             return output;
         }
+        private void SQLDefectMaker(String specialID,QualityCheck thisCheck)
+        {
+            String output = "INSERT INTO QualityCheckDefects(SpecialCheck,Scratches,Dents,Sharps,LooseCups,Discoloration,Rust,CoatingPeel,Delamination,UnevenBottom,OpenCurl,Wrinkles,Cracks)";
+            output += " VALUES (" + specialID ;
+            foreach(bool check in thisCheck.defectList)
+            {
+                if(check)
+                {
+                    output += ",1";
+                }
+                else
+                {
+                    output += ",0";
+                }
+            }
+            output += ");";
+            using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+            }
+
+        }
+            
 
         private async void MasterPartCheck(string partName)
         {
@@ -745,12 +675,19 @@ namespace Quality_Inspection
             bord.Background = LSB;
         }
 
+
+        private void ClickUnSave(object sender, PointerRoutedEventArgs e)
+        {
+            Image pic = sender as Image;
+            Border bord = pic.Parent as Border;
+            bord.BorderBrush = SB;
+            bord.Background = LSB;
+        }
         /// <summary>
         /// Reloads data if a different date is selected. 
         /// </summary>
         private void DateChange(object sender, DatePickerValueChangedEventArgs e)
         {
-            SetupMasterList();
             DefectListSetup();
         }
 
