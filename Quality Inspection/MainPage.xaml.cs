@@ -292,7 +292,7 @@ namespace Quality_Inspection
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ee) { LogError(ee.ToString()); }
                 }
 
             }
@@ -350,9 +350,9 @@ namespace Quality_Inspection
         /// <summary>
         /// Processes the signature for QA Tech
         /// </summary>
-        private async Task SaveSign1()
+        private async Task SaveSign(String ID, int index)
         {
-            string fileName = "TechSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + "_" + RealShiftBox.SelectedIndex + "_" + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif";
+            string fileName = ID + dateBox.Date.ToString("yyyy_MM_dd") + "_" + RealShiftBox.SelectedIndex + "_" + LineBox.SelectedIndex + "_" + ShiftBox.SelectedIndex + ".gif";
 
             StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             Windows.Storage.CachedFileManager.DeferUpdates(newFile);
@@ -361,7 +361,7 @@ namespace Quality_Inspection
             // Write the ink strokes to the output stream.
             using (IOutputStream outputStream = stream.GetOutputStreamAt(0))
             {
-                await twoSigs[0].SaveAsync(outputStream);
+                await twoSigs[index].SaveAsync(outputStream);
                 await outputStream.FlushAsync();
             }
             stream.Dispose();
@@ -369,56 +369,10 @@ namespace Quality_Inspection
             // Finalize write so other apps can update file.
             Windows.Storage.Provider.FileUpdateStatus status =
                 await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(newFile);
-            newCheck.sigPath[0] = fileName;
+            newCheck.sigPath[index] = fileName;
             //return newFile;
         }
-
-        /// <summary>
-        /// Processes the signature for the diesetter
-        /// </summary>
-        private async Task SaveSign2()
-        {
-            string fileName = "DSSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + "_" + RealShiftBox.SelectedIndex + "_" + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif";
-
-            StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            Windows.Storage.CachedFileManager.DeferUpdates(newFile);
-            IRandomAccessStream stream =
-                    await newFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
-            // Write the ink strokes to the output stream.
-            using (IOutputStream outputStream = stream.GetOutputStreamAt(0))
-            {
-                await twoSigs[1].SaveAsync(outputStream);
-                await outputStream.FlushAsync();
-            }
-            stream.Dispose();
-
-            // Finalize write so other apps can update file.
-            Windows.Storage.Provider.FileUpdateStatus status =
-                await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(newFile);
-            newCheck.sigPath[1] = fileName;
-        }
-
-        private async Task SaveSign3()
-        {
-            string fileName = "SupSig_" + dateBox.Date.ToString("yyyy_MM_dd_") + "_" + RealShiftBox.SelectedIndex + "_" + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".gif";
-
-            StorageFile newFile = await saveHere.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
-            Windows.Storage.CachedFileManager.DeferUpdates(newFile);
-            IRandomAccessStream stream =
-                    await newFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
-            // Write the ink strokes to the output stream.
-            using (IOutputStream outputStream = stream.GetOutputStreamAt(0))
-            {
-                await twoSigs[2].SaveAsync(outputStream);
-                await outputStream.FlushAsync();
-            }
-            stream.Dispose();
-
-            // Finalize write so other apps can update file.
-            Windows.Storage.Provider.FileUpdateStatus status =
-                await Windows.Storage.CachedFileManager.CompleteUpdatesAsync(newFile);
-            newCheck.sigPath[2] = fileName;
-        }
+        
         /// <summary>
         /// Processes the defect checkboxes for saving data
         /// </summary>
@@ -451,9 +405,9 @@ namespace Quality_Inspection
             string[] initials = { QT_Initials.Text, DS_Initials.Text, Sup_Initials.Text };
             newCheck.initals = initials;
             
-            try { await SaveSign1(); } catch (Exception ee) { Console.WriteLine(ee); }
-            try { await SaveSign2(); } catch (Exception ee) { Console.WriteLine(ee); }
-            try { await SaveSign3(); } catch (Exception ee) { Console.WriteLine(ee); }
+            try { await SaveSign("TechSig_",0); } catch (Exception ee) { LogError(ee.ToString()); }
+            try { await SaveSign("DSSig_",1); } catch (Exception ee) { LogError(ee.ToString()); }
+            try { await SaveSign("SupSig_",2); } catch (Exception ee) { LogError(ee.ToString()); }
 
 
             if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
@@ -463,17 +417,21 @@ namespace Quality_Inspection
             
 
             newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
-            try { newCheck.defectList = DefectListMaker(); } catch { } 
-            try { newCheck.notes = NoteBox.Text; } catch { }
-            
+            try { newCheck.defectList = DefectListMaker(); } catch (Exception ee) { LogError(ee.ToString()); }
+            try { newCheck.notes = NoteBox.Text; } catch (Exception ee) { LogError(ee.ToString()); }
+
             String sqlString = sqlMaker(newCheck, dateBox.Date.Date.ToString("yyyy-MM-dd"));
             SQLSaver(sqlString);
                     
             this.Background = White;
             LightLeds(); //adds visual cue for shift already saved
             NoteBox.Text = "";
+            PartBox.Text = PartBox.Text.TrimEnd();
         }
-        
+
+        /// <summary>
+        /// Makes SQL string for add check to database. 
+        /// </summary>
         private String sqlMaker(QualityCheck thisCheck, String dater)
         {
             String output = "";
@@ -551,7 +509,7 @@ namespace Quality_Inspection
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception e) { LogError(e.ToString()); }
                 }
 
             }
@@ -602,6 +560,8 @@ namespace Quality_Inspection
         /// </summary>
         private void DateChange(object sender, DatePickerValueChangedEventArgs e)
         {
+            NoteBox.Text = "";
+            loadChange();
             DefectListSetup();
         }
 
@@ -610,6 +570,7 @@ namespace Quality_Inspection
         /// </summary>
         private void LoadShiftLED(object sender, SelectionChangedEventArgs e)
         {
+           
             LightLeds();
         }
 
@@ -645,7 +606,7 @@ namespace Quality_Inspection
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception e) { LogError(e.ToString()); }
                 }
 
             }
@@ -678,6 +639,7 @@ namespace Quality_Inspection
         /// </summary>
         private void ShiftChange(object sender, SelectionChangedEventArgs e)
         {
+            NoteBox.Text = "";
             loadChange();
         }
 
@@ -686,8 +648,43 @@ namespace Quality_Inspection
         /// </summary>
         private void loadChange()
         {
+            //PartBox.Text = "";
             if (isLoaded)
             {
+                String dater = dateBox.Date.Date.ToString("yyyy-MM-dd");
+                String sqlString = dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + ShiftBox.SelectedIndex.ToString() + "-" + (LineBox.SelectedIndex).ToString();
+                String output = "Select SpecialCheck,* FROM QualityCheck WHERE(SpecialCheck = '" + sqlString + "');";
+                bool badData = true;
+
+                String result = null;
+                using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = output;
+                        try
+                        {
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    result = reader.GetString(0).TrimEnd();
+                                    if (result != null && result != "")
+                                    {
+                                        badData = false;
+                                        SetUpCheck(result);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e) { LogError(e.ToString());}
+                    }
+                    if (badData && (dater != DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"))) { ClearData(); }
+                }
+
+
+
                 int shiftCheck = ShiftBox.SelectedIndex;
                 int whichLine = LineBox.SelectedIndex;
                 string date = dateBox.Date.Date.ToString("yyyy_MM_dd");
@@ -704,14 +701,54 @@ namespace Quality_Inspection
             }
         }
 
+        private void SetUpCheck(String SpecialID)
+        {
+            String output = "Select * FROM QualityCheck WHERE(SpecialCheck = '" + SpecialID + "');";
+            using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                PartBox.Text = reader.GetString(5);
+                                SampleCheck_true.IsChecked = reader.GetBoolean(6);
+                                SampleCheck_false.IsChecked = !reader.GetBoolean(6);
+                                PackageCheck_true.IsChecked = reader.GetBoolean(7);
+                                PackageCheck_false.IsChecked = !reader.GetBoolean(7);
+                                LidCheck_true.IsChecked = reader.GetBoolean(8);
+                                LidCheck_false.IsChecked = !reader.GetBoolean(8);
+                                DefectCheck_true.IsChecked = reader.GetBoolean(9);
+                                DefectCheck_false.IsChecked = !reader.GetBoolean(9);
+                                if (reader.GetString(11) != "   ") { QT_Initials.Text = reader.GetString(11); }
+                                if (reader.GetString(12) != "   ") { DS_Initials.Text = reader.GetString(12); }
+                                if (reader.GetString(17) != "   ") { Sup_Initials.Text = reader.GetString(17); }
+                                NoteBox.Text = reader.GetString(15);
+
+
+
+                            }
+                        }
+                    }
+                    catch (Exception e) { LogError(e.ToString()); this.Background = Purp;}
+                }
+            }
+
+        }
+
         /// <summary>
         /// Handles the return to this page by resetting icon buttons
         /// </summary>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            ViewBorder.BorderBrush = SB; SearchBorder.BorderBrush = SB;
-            ViewBorder.Background = LSB; SearchBorder.Background = LSB;
+            ViewBorder.BorderBrush = SB; SearchBorder.BorderBrush = SB; SaveBorder.BorderBrush = SB;
+            ViewBorder.Background = LSB; SearchBorder.Background = LSB; SaveBorder.Background = LSB;
         }
 
         /// <summary>
@@ -722,6 +759,7 @@ namespace Quality_Inspection
             List<String> masterPartList = new List<string>();
             sender.Text = sender.Text.ToUpper();
             String thisString = "SELECT DISTINCT PartNumber FROM QualityCheck ORDER BY PartNumber;";
+            //Creates Master List of Part from Database
             using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
             {
                 conn.Open();
@@ -739,12 +777,12 @@ namespace Quality_Inspection
                             }
                         }
                     }
-                    catch { }
+                    catch(Exception e) { LogError(e.ToString()); }
                 }
             }
+            //Generate Auto-Complete Suggestions
             try
             {
-                
                 if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
                 {
                     List<string> suggestions = SearchControls(sender.Text);
@@ -757,16 +795,39 @@ namespace Quality_Inspection
                     return suggestions;
                 }
             }
-            catch { }
+            catch (Exception e) { LogError(e.ToString()); }
         }
+        private void ClearData()
+        {
+            PartBox.Text = "";
+            NoteBox.Text = "";
+            SampleCheck_false.IsChecked = SampleCheck_true.IsChecked = false;
+            PackageCheck_false.IsChecked = PackageCheck_true.IsChecked = false;
+            LidCheck_false.IsChecked = LidCheck_true.IsChecked = false;
+            DefectCheck_false.IsChecked = DefectCheck_true.IsChecked = false;
+            QT_Initials.Text = DS_Initials.Text = Sup_Initials.Text = "";
+            inkyCanvas.InkPresenter.StrokeContainer = null;
+            inkyCanvasDS.InkPresenter.StrokeContainer = null;
+            inkyCanvasSup.InkPresenter.StrokeContainer = null;
+        }
+
+
 
         /// <summary>
         /// Handles the autosuggestion selection
         /// </summary>
         private void ChoseThis(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            var selectedItem = args.SelectedItem.ToString();
-            sender.Text = selectedItem;
+            String selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem.TrimEnd();
+        }
+
+        /// <summary>
+        /// Creates daily error log ....eventually
+        /// </summary>
+        private async void LogError(String e)
+        {
+            Console.WriteLine(e + " @ " + DateTimeOffset.Now.ToString());
         }
     }
 }

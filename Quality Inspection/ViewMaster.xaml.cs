@@ -36,10 +36,12 @@ namespace Quality_Inspection
         SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
 
         CalendarViewDayItem newDay = new CalendarViewDayItem();//allows for disabling of unworked days
+        String chooseDate = "";
 
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
         ObservableCollection<string> newShiftSource = new ObservableCollection<string> {"Shift Start","Hour 1","First Break","Hour 3","Hour 4","After Lunch", "Hour 6", "Second Break", "Hour 8" };
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//source lists
+        ObservableCollection<string> RealShifts = new ObservableCollection<string> { "1st", "2nd", "3rd" };
 
         List<DateTimeOffset> masterList = new List<DateTimeOffset>(); //master date list for enabling worked days
         List<List<Button>> buttonTracker = new List<List<Button>>(); //list of generated buttons
@@ -70,7 +72,13 @@ namespace Quality_Inspection
         /// </summary>
         public ViewMaster()
         {
-            this.InitializeComponent();     
+            
+            this.InitializeComponent();
+            Shifter.ItemsSource = RealShifts;
+            ShiftBox.ItemsSource = newShiftSource;
+            LineBox.ItemsSource = LineSource;
+            RealShiftBox.ItemsSource = RealShifts;
+            Shifter.SelectedIndex = 0;
         }
 
 
@@ -92,11 +100,10 @@ namespace Quality_Inspection
             SQL_Loader(DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"));
             ButtonSetUp();
             loadMaster();
-            
+            chooseDate = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
             DDD.Visibility = Visibility.Collapsed;
-            
-
         }
+
         private void SQL_MasterDate()
         {
             String output = "SELECT DISTINCT CheckDate FROM QualityCheck ORDER BY CheckDate;";
@@ -132,6 +139,7 @@ namespace Quality_Inspection
             }
             
         }
+
         private void SQL_Loader(String date)
         {
             String output = "SELECT PartNumber,CheckNo,CheckShift,LineNumber,SpecialCheck FROM QualityCheck";
@@ -201,22 +209,45 @@ namespace Quality_Inspection
             String[] locate = clickedButton.Name.Split('_');
 
             //gg.Text = clickedButton.Name;
-            String date;
-            try { date = Cale.SelectedDates[0].ToString("yyyy_MM_dd"); }
-            catch { date = DateTimeOffset.Now.ToString("yyyy_MM_dd"); }
+            String date = "";
+            try { date = chooseDate; }
+            catch { date = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"); }
+            String name = date + "-" + Shifter.SelectedIndex + "-" + locate[1].ToString() + "-" + locate[0].ToString();
+            String output = "SELECT * FROM QualityCheck WHERE(SpecialCheck = '" + name + "');";
+
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                gg.Text = name;
+                                loadDate.Date = reader.GetDateTime(1);
+                                ShiftBox.SelectedIndex = reader.GetByte(3);
+                                RealShiftBox.SelectedIndex = Shifter.SelectedIndex;
+                                LineBox.SelectedIndex = reader.GetInt32(10);
+                                PartBox.Text = reader.GetString(5).TrimEnd();
 
 
-            String name = "Sheet_" + date + "_" + LineSource[Convert.ToInt16(locate[0])] + "_" + ShiftSource[Convert.ToInt16(locate[1])] + ".json";
-            StorageFolder localFolder = KnownFolders.MusicLibrary;
-            StorageFolder dayFolder = await localFolder.GetFolderAsync(date);
-            shiftFolder = await dayFolder.GetFolderAsync(ShiftSource[Convert.ToInt16(locate[1])]);
-            StorageFile localFile = await shiftFolder.GetFileAsync(name);
-            String json = await FileIO.ReadTextAsync(localFile);
-            loadCheck = JsonConvert.DeserializeObject(json, typeof(MainPage.QualityCheck)) as MainPage.QualityCheck;
-            gg.Text = loadCheck.partName;
+
+                            }
+                        }
+                    }
+                    catch (Exception ee) { String error = ee.ToString(); }
+                }
+
+            }
+            
+           // gg.Text = loadCheck.partName;
             GGG.Visibility = Visibility.Collapsed;
             DDD.Visibility = Visibility.Visible;
-            loadDate.Date = loadCheck.date;
+            /*loadDate.Date = loadCheck.date;
             Time.Text = loadCheck.date.ToString("hh:mm");
             PartBox.Text = loadCheck.partName;
             LineBox.Text = loadCheck.lineName.ToString() ;
@@ -303,7 +334,7 @@ namespace Quality_Inspection
             }
             catch { }
 
-
+    */
             //gg.Text = name;
         }
         private void ClickView(object sender, PointerRoutedEventArgs e)
@@ -389,7 +420,8 @@ namespace Quality_Inspection
         private async void hola(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
         {
             //this.Background = Red;
-            String chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd");
+
+            try { chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd"); } catch { }
             loadChecks.Clear();
             SQL_Loader(chooseDate);
             ClearButtons();

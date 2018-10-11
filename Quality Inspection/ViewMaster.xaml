@@ -10,8 +10,8 @@
 
     <Grid>
         <CalendarView x:Name="Cale" HorizontalAlignment="Left" Margin="37,38,0,0" VerticalAlignment="Top" CalendarViewDayItemChanging="CalendarView_CalendarViewDayItemChanging" SelectedDatesChanged="hola"/>
-        <TextBox x:Name="gg" HorizontalAlignment="Left" Margin="150,399,0,0" Text="TextBox" VerticalAlignment="Top"/>
-        <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3">
+        <TextBox x:Name="gg" HorizontalAlignment="Left" Margin="204,399,0,0" Text="TextBox" VerticalAlignment="Top" Width="159"/>
+        <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
             <Grid x:Name="Grud" HorizontalAlignment="Left" VerticalAlignment="Center" Width="850">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="85" />
@@ -71,25 +71,27 @@
                 <TextBlock HorizontalAlignment="Center" Text="Hour 8" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="9" Height="Auto"/>
             </Grid>
         </Border>
-        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
+        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="368,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" Width="1112">
             <Grid HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" Width="1024">
                 <RelativePanel HorizontalAlignment="Left" Height="128" Margin="49,387,0,0" VerticalAlignment="Top" Width="333">
                     <TextBox x:Name="NoteBox" HorizontalAlignment="Left" Margin="57,0,0,0" Text="" VerticalAlignment="Center" Width="276" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxWidth="300" TextWrapping="Wrap" Height="128" IsReadOnly="True"/>
                     <TextBlock HorizontalAlignment="Left" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 </RelativePanel>
-                <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1024" Margin="0,0,0,0">
+                <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1083" Margin="-21,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="513*"/>
                         <ColumnDefinition Width="511*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1024">
-                        <DatePicker x:Name="loadDate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="42,0,0,0"/>
-                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" />
-                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="LineBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Width="64" />
-                        <TextBlock HorizontalAlignment="Center" Margin="42,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="ShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Width="64" />
+                    <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1092">
+                        <DatePicker x:Name="loadDate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" />
+                        <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5,0,0,0" Width="140" />
+                        <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="LineBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4.8,0,0,0" Width="54" />
+                        <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Hour:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="RealShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" />
                     </StackPanel>
                     <CheckBox x:Name="SampleCheck_true" Content="Production Pan Matches Sample" HorizontalAlignment="Left" Margin="45,72,0,0" VerticalAlignment="Top" IsEnabled="False" />
                     <CheckBox x:Name="SampleCheck_false" Content="N/A" HorizontalAlignment="Left" Margin="322,72,0,0" VerticalAlignment="Top" IsEnabled="False" />
@@ -156,11 +158,11 @@
 
 
                 </Grid>
-                <TextBlock x:Name="Time" Text="34:72" FontSize="18" Margin="513,108,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
 
             </Grid>
         </Border>
         <Button Content="Back" HorizontalAlignment="Left" Margin="150,457,0,0" VerticalAlignment="Top" Click="BackToMain"/>
+        <ComboBox x:Name="Shifter" HorizontalAlignment="Left" Margin="37,399,0,0" VerticalAlignment="Top" Width="79" />
     </Grid>
 </Page>
