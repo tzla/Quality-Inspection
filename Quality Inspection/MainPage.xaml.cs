@@ -450,14 +450,14 @@ namespace Quality_Inspection
                 else if (checkNo == 6) { thisTime = "13:00:00"; }
                 else if (checkNo == 7) { thisTime = "14:10:00"; }
                 else if (checkNo == 8) { thisTime = "15:00:00"; }
-                output += thisTime + "',";
+                //output += thisTime + "',";
 
             }
             else
             {
-                output += thisCheck.date.Date.ToString("HH:mm:ss") + "',";
+                
             }
-            
+            output += DateTimeOffset.Now.ToString("HH:mm:ss") + "',";
             output += checkNo.ToString() + ",";
             output += RealShiftBox.SelectedIndex.ToString() + ",'" + thisCheck.partName + "',";
             if (thisCheck.sampleMatch) { output += "1,"; } else { output += "0,"; }
@@ -632,6 +632,7 @@ namespace Quality_Inspection
             if (LedList[7]) { S8.Fill = Pink; }
             if (LedList[8]) { S9.Fill = Brown; }
             loadChange();
+            PartBox.Text = "";
         }
 
         /// <summary>
@@ -673,7 +674,6 @@ namespace Quality_Inspection
                                     if (result != null && result != "")
                                     {
                                         badData = false;
-                                        SetUpCheck(result);
                                     }
                                 }
                             }
@@ -699,46 +699,6 @@ namespace Quality_Inspection
                 }*/
                 QualityCheck loadCheck = new QualityCheck();
             }
-        }
-
-        private void SetUpCheck(String SpecialID)
-        {
-            String output = "Select * FROM QualityCheck WHERE(SpecialCheck = '" + SpecialID + "');";
-            using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = output;
-                    try
-                    {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                PartBox.Text = reader.GetString(5);
-                                SampleCheck_true.IsChecked = reader.GetBoolean(6);
-                                SampleCheck_false.IsChecked = !reader.GetBoolean(6);
-                                PackageCheck_true.IsChecked = reader.GetBoolean(7);
-                                PackageCheck_false.IsChecked = !reader.GetBoolean(7);
-                                LidCheck_true.IsChecked = reader.GetBoolean(8);
-                                LidCheck_false.IsChecked = !reader.GetBoolean(8);
-                                DefectCheck_true.IsChecked = reader.GetBoolean(9);
-                                DefectCheck_false.IsChecked = !reader.GetBoolean(9);
-                                if (reader.GetString(11) != "   ") { QT_Initials.Text = reader.GetString(11); }
-                                if (reader.GetString(12) != "   ") { DS_Initials.Text = reader.GetString(12); }
-                                if (reader.GetString(17) != "   ") { Sup_Initials.Text = reader.GetString(17); }
-                                NoteBox.Text = reader.GetString(15);
-
-
-
-                            }
-                        }
-                    }
-                    catch (Exception e) { LogError(e.ToString()); this.Background = Purp;}
-                }
-            }
-
         }
 
         /// <summary>
