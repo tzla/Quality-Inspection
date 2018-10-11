@@ -37,6 +37,7 @@ namespace Quality_Inspection
 
         CalendarViewDayItem newDay = new CalendarViewDayItem();//allows for disabling of unworked days
         String chooseDate = "";
+        String mySpecialID = "";
 
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
         ObservableCollection<string> newShiftSource = new ObservableCollection<string> {"Shift Start","Hour 1","First Break","Hour 3","Hour 4","After Lunch", "Hour 6", "Second Break", "Hour 8" };
@@ -203,10 +204,63 @@ namespace Quality_Inspection
             buttonTracker[col - 1] = buttonCol;
         }
 
+        private void GetMyDefects(String SpecialID)
+        {
+            String output = "SELECT * FROM QualityCheckDefects WHERE(SpecialCheck = '" + SpecialID + "');";
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                D0.IsChecked = reader.GetBoolean(1); 
+                                D1.IsChecked = reader.GetBoolean(2); 
+                                D2.IsChecked = reader.GetBoolean(3); 
+                                D3.IsChecked = reader.GetBoolean(4); 
+                                D4.IsChecked = reader.GetBoolean(5); 
+                                D5.IsChecked = reader.GetBoolean(6); 
+                                D6.IsChecked = reader.GetBoolean(7); 
+                                D7.IsChecked = reader.GetBoolean(8);
+                                D8.IsChecked = reader.GetBoolean(9); 
+                                D9.IsChecked = reader.GetBoolean(10);
+                                D10.IsChecked = reader.GetBoolean(11); 
+                                D11.IsChecked = reader.GetBoolean(12); 
+
+
+                            }
+                        }
+                    }
+                    catch (Exception ee) { String error = ee.ToString(); }
+                }
+            }
+        }
+
+        private void OnOffState(bool state)
+        {
+            D0.IsEnabled = D1.IsEnabled = D2.IsEnabled = D3.IsEnabled = D4.IsEnabled = D5.IsEnabled = D6.IsEnabled
+                 = D7.IsEnabled = D8.IsEnabled = D9.IsEnabled = D10.IsEnabled = D11.IsEnabled = state;
+            NoteBox.IsEnabled = DefectCheck_true.IsEnabled = DefectCheck_false.IsEnabled = LidCheck_true.IsEnabled = LidCheck_false.IsEnabled = state;
+            SampleCheck_true.IsEnabled = SampleCheck_false.IsEnabled = PackageCheck_true.IsEnabled = PackageCheck_false.IsEnabled = state;
+            PartBox.IsEnabled = state;
+        }
+
+
+
         private async void buttonClick(object sender, RoutedEventArgs e)
         {
             Button clickedButton = sender as Button;
             String[] locate = clickedButton.Name.Split('_');
+
+            Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Collapsed;
+            loadDate.IsEnabled = ShiftBox.IsEnabled = RealShiftBox.IsEnabled = LineBox.IsEnabled = false;
+
+
 
             //gg.Text = clickedButton.Name;
             String date = "";
@@ -214,7 +268,7 @@ namespace Quality_Inspection
             catch { date = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"); }
             String name = date + "-" + Shifter.SelectedIndex + "-" + locate[1].ToString() + "-" + locate[0].ToString();
             String output = "SELECT * FROM QualityCheck WHERE(SpecialCheck = '" + name + "');";
-
+            mySpecialID = name;
             using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
             {
                 conn.Open();
@@ -228,13 +282,39 @@ namespace Quality_Inspection
                             while (reader.Read())
                             {
                                 gg.Text = name;
+
                                 loadDate.Date = reader.GetDateTime(1);
+
                                 ShiftBox.SelectedIndex = reader.GetByte(3);
+
                                 RealShiftBox.SelectedIndex = Shifter.SelectedIndex;
+
                                 LineBox.SelectedIndex = reader.GetInt32(10);
+
                                 PartBox.Text = reader.GetString(5).TrimEnd();
+                                
+                                SampleCheck_true.IsChecked = reader.GetBoolean(6);
+                                SampleCheck_false.IsChecked = !reader.GetBoolean(6);
+                                
+                                PackageCheck_true.IsChecked = reader.GetBoolean(7);
+                                PackageCheck_false.IsChecked = !reader.GetBoolean(7);
+                                
+                                LidCheck_true.IsChecked = reader.GetBoolean(8);
+                                LidCheck_false.IsChecked = !reader.GetBoolean(8);
 
+                                
+                                DefectCheck_true.IsChecked = reader.GetBoolean(9);
+                                DefectCheck_false.IsChecked = !reader.GetBoolean(9);
 
+                                OnOffState(false);
+
+                                if(reader.GetBoolean(9))
+                                {
+                                    GetMyDefects(name);
+                                }
+
+                                NoteBox.Text = reader.GetString(15).TrimEnd();
+                                
 
                             }
                         }
@@ -342,6 +422,8 @@ namespace Quality_Inspection
             ViewBorder.BorderBrush = SLB;
             ViewBorder.Background = SB;
             this.Frame.Navigate(typeof(ViewMaster), masterList);
+            Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Visible;
+            EditSwitch.IsOn = false;
         }
 
         private void ClickUnview(object sender, PointerRoutedEventArgs e)
@@ -441,6 +523,137 @@ namespace Quality_Inspection
         private void BackToMain(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(MainPage));
+        }
+
+        private void EditSwitcher(object sender, RoutedEventArgs e)
+        {
+            ToggleSwitch editer = sender as ToggleSwitch;
+            if (editer.IsOn)
+            {
+                OnOffState(true);
+                SaveBorder.BorderBrush = SB;
+                SaveBorder.Background = LSB;
+            }
+            else
+            {
+                OnOffState(false);
+                SaveBorder.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Gray);
+                SaveBorder.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+            }
+        }
+
+        private void SaveClick(object sender, PointerRoutedEventArgs e)
+        {
+            if (EditSwitch.IsOn)
+            {
+                SaveBorder.BorderBrush = SLB;
+                SaveBorder.Background = SB;
+                String output = "UPDATE QualityCheck SET ";
+                output += "PartNumber = '" + PartBox.Text + "', ";
+                output += "SampleMatch = ";
+                if ((bool)SampleCheck_true.IsChecked) { output += "1, "; } else { output += "0, "; }
+                output += "PackageMatch = ";
+                if ((bool)PackageCheck_true.IsChecked) { output += "1, "; } else { output += "0, "; }
+                output += "LidMatch = ";
+                if ((bool)LidCheck_true.IsChecked) { output += "1, "; } else { output += "0, "; }
+                output += "DefectCheck = ";
+                if ((bool)DefectCheck_true.IsChecked) { output += "1, "; } else { output += "0, "; }
+                output += "Notes = '" + NoteBox.Text + "' ";
+                output += " WHERE SpecialCheck = '" + mySpecialID.ToString() + "';";
+
+                String output2 = "UPDATE QualityCheckDefects SET ";
+
+                using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = output;
+                        try
+                        {
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                   
+                                }
+                            }
+                        }
+                        catch (Exception ee) { String error = ee.ToString(); }
+                    }
+                }
+
+
+
+
+
+
+
+
+
+            }
+
+        }
+
+        private void SaveUnclick(object sender, PointerRoutedEventArgs e)
+        {
+            if (EditSwitch.IsOn)
+            {
+                SaveBorder.BorderBrush = SB;
+                SaveBorder.Background = LSB;
+            }
+
+        }
+
+        private void SampleCheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox thisBox = sender as CheckBox;
+            string boxName = thisBox.Name;
+            string[] splitName = boxName.Split('_');
+            bool whichBox = Convert.ToBoolean(splitName[1]);
+            if (whichBox) //makes one box checked at a time
+            {
+                SampleCheck_false.IsChecked = false;
+            }
+            else
+            {
+                SampleCheck_true.IsChecked = false;
+            }
+        }
+
+        private void PackageCheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox thisBox = sender as CheckBox;
+            string boxName = thisBox.Name;
+            string[] splitName = boxName.Split('_');
+            bool whichBox = Convert.ToBoolean(splitName[1]);
+            if (whichBox) //makes one box checked at a time
+            {
+                PackageCheck_false.IsChecked = false;
+            }
+            else
+            {
+                PackageCheck_true.IsChecked = false;
+            }
+        }
+
+        /// <summary>
+        /// Processes the lid fit checkboxes
+        /// </summary>
+        private void LidCheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox thisBox = sender as CheckBox;
+            string boxName = thisBox.Name;
+            string[] splitName = boxName.Split('_');
+            bool whichBox = Convert.ToBoolean(splitName[1]);
+            if (whichBox) //makes one box checked at a time
+            {
+                LidCheck_false.IsChecked = false;
+            }
+            else
+            {
+                LidCheck_true.IsChecked = false;
+            }
         }
     }
 

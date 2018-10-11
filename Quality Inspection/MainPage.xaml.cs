@@ -478,6 +478,8 @@ namespace Quality_Inspection
             //output = "INSERT INTO QualityCheck(CheckDate, CheckTime, CheckNo, SampleMatch, CheckShift, LineNumber, PartNumber) Values('2018-10-04', '12:24:10', 0, 2, 0, 3, 'WM88-173');";
             return output;
         }
+
+
         private void SQLDefectMaker(String specialID,QualityCheck thisCheck)
         {
             String output = "INSERT INTO QualityCheckDefects(SpecialCheck,Scratches,Dents,Sharps,LooseCups,Discoloration,Rust,CoatingPeel,Delamination,UnevenBottom,OpenCurl,Wrinkles,Cracks)";
@@ -649,6 +651,17 @@ namespace Quality_Inspection
         /// </summary>
         private void loadChange()
         {
+            DefectCheck_true.IsChecked = false;
+            DefectCheck_false.IsChecked = true;
+            DefectGrid.Background = LG;
+            ToolTip toolTip = new ToolTip();
+            toolTip.Content = "Check Defect Box To Enable";
+            ToolTipService.SetToolTip(DefectGrid, toolTip);
+            foreach (CheckBox thisDefect in DefectList)
+            {
+                thisDefect.IsChecked = false;
+                thisDefect.IsEnabled = false;
+            }
             //PartBox.Text = "";
             if (isLoaded)
             {
@@ -682,22 +695,6 @@ namespace Quality_Inspection
                     }
                     if (badData && (dater != DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"))) { ClearData(); }
                 }
-
-
-
-                int shiftCheck = ShiftBox.SelectedIndex;
-                int whichLine = LineBox.SelectedIndex;
-                string date = dateBox.Date.Date.ToString("yyyy_MM_dd");
-
-                /*  FUTURE FEATURE: LOAD PREVIOUS DATA INTO MAIN PAGE 
-                if (shiftCheck == 0)
-                {
-                    if (partMasterList.morningList[whichLine] != null)
-                    {
-                        String name = "Sheet_" + date + "_" + LineBox.SelectedItem + "_" + ShiftBox.SelectedItem + ".json";
-                    }
-                }*/
-                QualityCheck loadCheck = new QualityCheck();
             }
         }
 
