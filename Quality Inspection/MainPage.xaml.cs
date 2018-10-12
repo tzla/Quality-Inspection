@@ -388,6 +388,38 @@ namespace Quality_Inspection
             return list;
         }
 
+
+
+        private String GetLastPart()
+        {
+            String output = "SELECT TOP 1 PartNumber From QualityCheck WHERE LineNumber = " + newCheck.lineName.ToString() + " ORDER BY CheckDate DESC, CheckNo DESC;";
+            String recentName = "";
+            using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = output;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                recentName = reader.GetString(0);
+                            }
+                        }
+                    }
+                    catch (Exception e) { LogError(e.ToString()); }
+                }
+
+            }
+            return recentName;
+        }
+
+
+
+
         /// <summary>
         /// Processes and Saves the entered data
         /// </summary>
@@ -402,31 +434,59 @@ namespace Quality_Inspection
             newCheck.partName = PartBox.Text;
             newCheck.date = DateTimeOffset.Now.LocalDateTime;
             newCheck.checkNumber = ShiftBox.SelectedIndex;
-            string[] initials = { QT_Initials.Text, DS_Initials.Text, Sup_Initials.Text };
-            newCheck.initals = initials;
-            
-            try { await SaveSign("TechSig_",0); } catch (Exception ee) { LogError(ee.ToString()); }
-            try { await SaveSign("DSSig_",1); } catch (Exception ee) { LogError(ee.ToString()); }
-            try { await SaveSign("SupSig_",2); } catch (Exception ee) { LogError(ee.ToString()); }
 
+            String checkName = GetLastPart().TrimEnd();
 
-            if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
+            if (checkName != newCheck.partName)
             {
-                masterList.Add(dateBox.Date.Date);
+                ContentDialog noWifiDialog = new ContentDialog()
+                {
+                    Title = "Confirm Part Change",
+                    Content = "Change Part From " + checkName + " to " + newCheck.partName,
+                    PrimaryButtonText = "Save",
+                    SecondaryButtonText = "Cancel"
+                };
+
+                var result = await noWifiDialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    
+                }
+                else
+                {
+                    return;
+                }
+
             }
             
 
-            newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
-            try { newCheck.defectList = DefectListMaker(); } catch (Exception ee) { LogError(ee.ToString()); }
-            try { newCheck.notes = NoteBox.Text; } catch (Exception ee) { LogError(ee.ToString()); }
+                string[] initials = { QT_Initials.Text, DS_Initials.Text, Sup_Initials.Text };
+                newCheck.initals = initials;
 
-            String sqlString = sqlMaker(newCheck, dateBox.Date.Date.ToString("yyyy-MM-dd"));
-            SQLSaver(sqlString);
-                    
-            this.Background = White;
-            LightLeds(); //adds visual cue for shift already saved
-            NoteBox.Text = "";
-            PartBox.Text = PartBox.Text.TrimEnd();
+                try { await SaveSign("TechSig_", 0); } catch (Exception ee) { LogError(ee.ToString()); }
+                try { await SaveSign("DSSig_", 1); } catch (Exception ee) { LogError(ee.ToString()); }
+                try { await SaveSign("SupSig_", 2); } catch (Exception ee) { LogError(ee.ToString()); }
+
+
+                if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
+                {
+                    masterList.Add(dateBox.Date.Date);
+                }
+
+
+                newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
+                try { newCheck.defectList = DefectListMaker(); } catch (Exception ee) { LogError(ee.ToString()); }
+                try { newCheck.notes = NoteBox.Text; } catch (Exception ee) { LogError(ee.ToString()); }
+
+                String sqlString = sqlMaker(newCheck, dateBox.Date.Date.ToString("yyyy-MM-dd"));
+                SQLSaver(sqlString);
+
+                this.Background = White;
+                LightLeds(); //adds visual cue for shift already saved
+                NoteBox.Text = "";
+                PartBox.Text = PartBox.Text.TrimEnd();
+            
+            
         }
 
         /// <summary>
