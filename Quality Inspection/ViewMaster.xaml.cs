@@ -31,7 +31,7 @@ namespace Quality_Inspection
         SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue); //preset colors
         SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
-        SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.WhiteSmoke);
+        SolidColorBrush White = new SolidColorBrush(Windows.UI.Colors.White);
         SolidColorBrush SLB = new SolidColorBrush(Windows.UI.Colors.SlateBlue);
         SolidColorBrush Red = new SolidColorBrush(Windows.UI.Colors.Red);
 
@@ -248,6 +248,7 @@ namespace Quality_Inspection
             NoteBox.IsEnabled = DefectCheck_true.IsEnabled = DefectCheck_false.IsEnabled = LidCheck_true.IsEnabled = LidCheck_false.IsEnabled = state;
             SampleCheck_true.IsEnabled = SampleCheck_false.IsEnabled = PackageCheck_true.IsEnabled = PackageCheck_false.IsEnabled = state;
             PartBox.IsEnabled = state;
+            NoteBox.IsReadOnly = !state;
         }
 
 
@@ -533,12 +534,15 @@ namespace Quality_Inspection
                 OnOffState(true);
                 SaveBorder.BorderBrush = SB;
                 SaveBorder.Background = LSB;
+                DefectGrid.Background = White;
             }
             else
             {
                 OnOffState(false);
                 SaveBorder.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Gray);
                 SaveBorder.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                DefectGrid.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+
             }
         }
 

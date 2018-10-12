@@ -166,8 +166,11 @@ namespace Quality_Inspection
         /// </summary>
         private void DefectListSetup()
         {
-            DefectList.Add(D0); DefectList.Add(D1); DefectList.Add(D2); DefectList.Add(D3); DefectList.Add(D4); DefectList.Add(D5); DefectList.Add(D6); DefectList.Add(D7);
-            DefectList.Add(D8); DefectList.Add(D9); DefectList.Add(D10); DefectList.Add(D11);
+            if (DefectList.Count != 12)
+            {
+                DefectList.Add(D0); DefectList.Add(D1); DefectList.Add(D2); DefectList.Add(D3); DefectList.Add(D4); DefectList.Add(D5); DefectList.Add(D6); DefectList.Add(D7);
+                DefectList.Add(D8); DefectList.Add(D9); DefectList.Add(D10); DefectList.Add(D11);
+            }
         }
 
         /// <summary>
@@ -694,7 +697,7 @@ namespace Quality_Inspection
             if (LedList[7]) { S8.Fill = Pink; }
             if (LedList[8]) { S9.Fill = Brown; }
             loadChange();
-            PartBox.Text = "";
+           // PartBox.Text = "";
         }
 
         /// <summary>
@@ -816,6 +819,7 @@ namespace Quality_Inspection
         }
         private void ClearData()
         {
+            /*
             PartBox.Text = "";
             NoteBox.Text = "";
             SampleCheck_false.IsChecked = SampleCheck_true.IsChecked = false;
@@ -826,6 +830,7 @@ namespace Quality_Inspection
             inkyCanvas.InkPresenter.StrokeContainer = null;
             inkyCanvasDS.InkPresenter.StrokeContainer = null;
             inkyCanvasSup.InkPresenter.StrokeContainer = null;
+            */
         }
 
 
