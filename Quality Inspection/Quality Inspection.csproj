@@ -127,6 +127,7 @@
   <ItemGroup>
     <Content Include="Assets\14-512.png" />
     <Content Include="Assets\cal.png" />
+    <Content Include="Assets\full-trash.png" />
     <Content Include="Assets\homeicon.png" />
     <Content Include="Assets\mager.png" />
     <Content Include="Assets\saveicon.png" />

@@ -86,7 +86,7 @@
                     <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1146">
                         <DatePicker x:Name="loadDate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" />
                         <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                        <TextBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5,0,0,0" Width="140" />
+                        <AutoSuggestBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" PlaceholderText="Part #" TextChanged="PartLookupTextChanged" SuggestionChosen="ChoseThis"/>
                         <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Line Number: " TextWrapping="Wrap" VerticalAlignment="Center"/>
                         <ComboBox x:Name="LineBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4.8,0,0,0" Width="54" />
                         <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Hour:" TextWrapping="Wrap" VerticalAlignment="Center"/>
@@ -130,7 +130,7 @@
                     </Grid>
                     <TextBlock x:Name="QT_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,180,0,0" Text="" VerticalAlignment="Top" />
                     <TextBlock x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,247,0,0" Text="" VerticalAlignment="Top" />
-                    <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="382.2,291,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+                    <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="382.2,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                         <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
                     </Border>
                     <TextBlock Text="Diesetter Signiture:" HorizontalAlignment="Left" Margin="554,257,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
@@ -161,6 +161,9 @@
                 </Grid>
                 <Border x:Name="SaveBorder" HorizontalAlignment="Left" Height="100" Margin="1010,180,0,0" VerticalAlignment="Top" Width="100" BorderBrush="Gray" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightGray" Visibility="Visible">
                     <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerReleased="SaveUnclick" ToolTipService.ToolTip="Save Edit" PointerPressed="SaveClick"/>
+                </Border>
+                <Border x:Name="TrashBorder" HorizontalAlignment="Left" Height="100" Margin="1010,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="Gray" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightGray" Visibility="Visible">
+                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/full-trash.png" Width="80" Height="80" PointerReleased="TrashUnclick" ToolTipService.ToolTip="Delete Sheet" PointerPressed="TrashClick"/>
                 </Border>
 
 

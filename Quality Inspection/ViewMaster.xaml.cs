@@ -40,7 +40,7 @@ namespace Quality_Inspection
         String mySpecialID = "";
 
         ObservableCollection<string> LineSource = new ObservableCollection<string> { "1", "1A", "2", "2A", "3", "3A", "4", "5", "5B", "6", "6A", "7", "8", "9", "10" };
-        ObservableCollection<string> newShiftSource = new ObservableCollection<string> {"Shift Start","Hour 1","First Break","Hour 3","Hour 4","After Lunch", "Hour 6", "Second Break", "Hour 8" };
+        ObservableCollection<string> newShiftSource = new ObservableCollection<string> { "Shift Start", "Hour 1", "First Break", "Hour 3", "Hour 4", "After Lunch", "Hour 6", "Second Break", "Hour 8" };
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Morning", "First", "Lunch", "Second" };//source lists
         ObservableCollection<string> RealShifts = new ObservableCollection<string> { "1st", "2nd", "3rd" };
 
@@ -73,7 +73,7 @@ namespace Quality_Inspection
         /// </summary>
         public ViewMaster()
         {
-            
+
             this.InitializeComponent();
             Shifter.ItemsSource = RealShifts;
             ShiftBox.ItemsSource = newShiftSource;
@@ -91,8 +91,9 @@ namespace Quality_Inspection
             base.OnNavigatedTo(e);
             this.InitializeComponent();
 
+            //caches page for reloading when navigating to different pages
             SQL_MasterDate();
-            for(int i =0;i<9;i++)
+            for (int i = 0; i < 9; i++)
             {
                 List<Button> newList = new List<Button>();
                 buttonTracker.Add(newList);
@@ -103,6 +104,7 @@ namespace Quality_Inspection
             loadMaster();
             chooseDate = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
             DDD.Visibility = Visibility.Collapsed;
+
         }
 
         private void SQL_MasterDate()
@@ -115,30 +117,30 @@ namespace Quality_Inspection
                 {
                     cmd.CommandText = output;
 
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
                             //string[] parts = reader.GetString(0).Split('-');
                             //DateTime dt = new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
-                                try
-                                {
-                                    DateTimeOffset dayer = reader.GetDateTime(0);
-                                    
-                                    masterList.Add(dayer);
-                                }
-                                catch(Exception ee)
-                                {
-                                    Console.WriteLine(ee.ToString());
-                                }
-                                
-                                
+                            try
+                            {
+                                DateTimeOffset dayer = reader.GetDateTime(0);
+
+                                masterList.Add(dayer);
                             }
+                            catch (Exception ee)
+                            {
+                                Console.WriteLine(ee.ToString());
+                            }
+
+
                         }
+                    }
 
                 }
             }
-            
+
         }
 
         private void SQL_Loader(String date)
@@ -169,7 +171,7 @@ namespace Quality_Inspection
                             }
                         }
                     }
-                    catch(Exception ee) { String error = ee.ToString(); }
+                    catch (Exception ee) { String error = ee.ToString(); }
                 }
 
             }
@@ -177,31 +179,43 @@ namespace Quality_Inspection
 
         private void ButtonSetUp()
         {
+            if (load2)
+            {
+                //Grud.Children.Clear();
+            }
             makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
             makeButtons(5); makeButtons(6); makeButtons(7); makeButtons(8); makeButtons(9);
+            load2 = true;
         }
 
         private void makeButtons(int col)
         {
-            List<Button> buttonCol = new List<Button>();
-            for(int i =0;i<15;i++)
+            if (!load2)
             {
-                Button newButton = new Button();
-                newButton.HorizontalAlignment = HorizontalAlignment.Center;
-                newButton.VerticalAlignment = VerticalAlignment.Center;
-                newButton.Height = 26;
-                newButton.Width = 75;
-                newButton.FontSize = 8.5;
-                newButton.Name = i.ToString() + "_" + (col-1).ToString();
-                newButton.IsEnabled = false;
-                Grud.Children.Add(newButton);
-                Grid.SetRow(newButton, i+1);
-                Grid.SetColumn(newButton, col);
-                newButton.Content = "N/A";
-                buttonCol.Add(newButton);
-                newButton.Click += buttonClick;
+                List<Button> buttonCol = new List<Button>();
+                for (int i = 0; i < 15; i++)
+                {
+                    Button newButton = new Button();
+                    newButton.HorizontalAlignment = HorizontalAlignment.Center;
+                    newButton.VerticalAlignment = VerticalAlignment.Center;
+                    newButton.Height = 26;
+                    newButton.Width = 75;
+                    newButton.FontSize = 8.5;
+                    newButton.Name = i.ToString() + "_" + (col - 1).ToString();
+                    newButton.IsEnabled = false;
+                    Grud.Children.Add(newButton);
+                    Grid.SetRow(newButton, i + 1);
+                    Grid.SetColumn(newButton, col);
+                    newButton.Content = "N/A";
+                    buttonCol.Add(newButton);
+                    newButton.Click += buttonClick;
+                }
+                buttonTracker[col - 1] = buttonCol;
             }
-            buttonTracker[col - 1] = buttonCol;
+            else
+            {
+                ButtonTask();
+            }
         }
 
         private void GetMyDefects(String SpecialID)
@@ -219,18 +233,18 @@ namespace Quality_Inspection
                         {
                             while (reader.Read())
                             {
-                                D0.IsChecked = reader.GetBoolean(1); 
-                                D1.IsChecked = reader.GetBoolean(2); 
-                                D2.IsChecked = reader.GetBoolean(3); 
-                                D3.IsChecked = reader.GetBoolean(4); 
-                                D4.IsChecked = reader.GetBoolean(5); 
-                                D5.IsChecked = reader.GetBoolean(6); 
-                                D6.IsChecked = reader.GetBoolean(7); 
+                                D0.IsChecked = reader.GetBoolean(1);
+                                D1.IsChecked = reader.GetBoolean(2);
+                                D2.IsChecked = reader.GetBoolean(3);
+                                D3.IsChecked = reader.GetBoolean(4);
+                                D4.IsChecked = reader.GetBoolean(5);
+                                D5.IsChecked = reader.GetBoolean(6);
+                                D6.IsChecked = reader.GetBoolean(7);
                                 D7.IsChecked = reader.GetBoolean(8);
-                                D8.IsChecked = reader.GetBoolean(9); 
+                                D8.IsChecked = reader.GetBoolean(9);
                                 D9.IsChecked = reader.GetBoolean(10);
-                                D10.IsChecked = reader.GetBoolean(11); 
-                                D11.IsChecked = reader.GetBoolean(12); 
+                                D10.IsChecked = reader.GetBoolean(11);
+                                D11.IsChecked = reader.GetBoolean(12);
 
 
                             }
@@ -293,29 +307,29 @@ namespace Quality_Inspection
                                 LineBox.SelectedIndex = reader.GetInt32(10);
 
                                 PartBox.Text = reader.GetString(5).TrimEnd();
-                                
+
                                 SampleCheck_true.IsChecked = reader.GetBoolean(6);
                                 SampleCheck_false.IsChecked = !reader.GetBoolean(6);
-                                
+
                                 PackageCheck_true.IsChecked = reader.GetBoolean(7);
                                 PackageCheck_false.IsChecked = !reader.GetBoolean(7);
-                                
+
                                 LidCheck_true.IsChecked = reader.GetBoolean(8);
                                 LidCheck_false.IsChecked = !reader.GetBoolean(8);
 
-                                
+
                                 DefectCheck_true.IsChecked = reader.GetBoolean(9);
                                 DefectCheck_false.IsChecked = !reader.GetBoolean(9);
 
                                 OnOffState(false);
 
-                                if(reader.GetBoolean(9))
+                                if (reader.GetBoolean(9))
                                 {
                                     GetMyDefects(name);
                                 }
 
                                 NoteBox.Text = reader.GetString(15).TrimEnd();
-                                
+
 
                             }
                         }
@@ -324,8 +338,8 @@ namespace Quality_Inspection
                 }
 
             }
-            
-           // gg.Text = loadCheck.partName;
+
+            // gg.Text = loadCheck.partName;
             GGG.Visibility = Visibility.Collapsed;
             DDD.Visibility = Visibility.Visible;
             /*loadDate.Date = loadCheck.date;
@@ -422,7 +436,6 @@ namespace Quality_Inspection
         {
             ViewBorder.BorderBrush = SLB;
             ViewBorder.Background = SB;
-            this.Frame.Navigate(typeof(ViewMaster), masterList);
             Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Visible;
             EditSwitch.IsOn = false;
         }
@@ -431,9 +444,16 @@ namespace Quality_Inspection
         {
             ViewBorder.BorderBrush = SB;
             ViewBorder.Background = LSB;
+            ButtonBack();
+        }
+
+        private async void ButtonBack()
+        {
             GGG.Visibility = Visibility.Visible;
             DDD.Visibility = Visibility.Collapsed;
+            Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Visible;
         }
+
 
         private async void loadMaster()
         {
@@ -450,7 +470,7 @@ namespace Quality_Inspection
                 List<Button> thisButtonList = buttonTracker[col];
                 Button myButton = thisButtonList[row];
                 myButton.Content = content;
-                myButton.IsEnabled = true; 
+                myButton.IsEnabled = true;
             }
         }
 
@@ -477,13 +497,13 @@ namespace Quality_Inspection
                     // Register callback for next phase.
                     args.RegisterUpdateCallback(CalendarView_CalendarViewDayItemChanging);
                 }
-                
+
                 // Set density bars.
             }
             else
             {
                 args.Item.Background = new SolidColorBrush(Windows.UI.Colors.Aquamarine);
-               
+
             }
         }
         private async Task saveMaster()
@@ -492,23 +512,23 @@ namespace Quality_Inspection
 
         private void ClearButtons()
         {
-           foreach(List<Button> thisCol in buttonTracker)
+            foreach (List<Button> thisCol in buttonTracker)
             {
-                foreach(Button thisButton in thisCol)
+                foreach (Button thisButton in thisCol)
                 {
                     Grud.Children.Remove(thisButton);
                 }
             }
         }
-        private async void hola(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
-        {
-            //this.Background = Red;
 
-            try { chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd"); } catch { }
+        private async void ButtonTask()
+        {
+            
             loadChecks.Clear();
             SQL_Loader(chooseDate);
             ClearButtons();
             buttonTracker.Clear();
+            
             for (int i = 0; i < 9; i++)
             {
                 List<Button> newList = new List<Button>();
@@ -518,7 +538,14 @@ namespace Quality_Inspection
 
 
             loadMaster();
-            
+        }
+        
+        private async void hola(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
+        {
+            //this.Background = Red;
+            load2 = false;
+            try { chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd"); } catch { }
+            ButtonTask(); 
         }
 
         private void BackToMain(object sender, RoutedEventArgs e)
@@ -532,15 +559,16 @@ namespace Quality_Inspection
             if (editer.IsOn)
             {
                 OnOffState(true);
-                SaveBorder.BorderBrush = SB;
-                SaveBorder.Background = LSB;
+                SaveBorder.BorderBrush = TrashBorder.BorderBrush = SB;
+                SaveBorder.Background = TrashBorder.Background = LSB;
+                
                 DefectGrid.Background = White;
             }
             else
             {
                 OnOffState(false);
-                SaveBorder.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Gray);
-                SaveBorder.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                SaveBorder.BorderBrush = TrashBorder.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Gray);
+                SaveBorder.Background = TrashBorder.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
                 DefectGrid.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
 
             }
@@ -586,6 +614,75 @@ namespace Quality_Inspection
                         catch (Exception ee) { String error = ee.ToString(); }
                     }
                 }
+                int col = Convert.ToInt16(mySpecialID.Split('-')[4]);
+                int row = Convert.ToInt16(mySpecialID.Split('-')[5]);
+                String content = PartBox.Text;
+                List<Button> thisButtonList = buttonTracker[col];
+                Button myButton = thisButtonList[row];
+                myButton.Content = content;
+
+
+
+
+
+
+
+
+
+            }
+
+        }
+
+
+        private void TrashClick(object sender, PointerRoutedEventArgs e)
+        {
+            if (EditSwitch.IsOn)
+            {
+                TrashBorder.BorderBrush = SLB;
+                TrashBorder.Background = SB;
+                String output = "DELETE FROM QualityCheck ";
+                output += " WHERE SpecialCheck = '" + mySpecialID.ToString() + "';";
+                using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = output;
+                        try
+                        {
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+
+                                }
+                            }
+                        }
+                        catch (Exception ee) { String error = ee.ToString(); }
+                    }
+                }
+
+                output = "DELETE FROM QualityCheckDefects ";
+                output += " WHERE SpecialCheck = '" + mySpecialID.ToString() + "';";
+                using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = output;
+                        try
+                        {
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+
+                                }
+                            }
+                        }
+                        catch (Exception ee) { String error = ee.ToString(); }
+                    }
+                }
 
 
 
@@ -605,7 +702,26 @@ namespace Quality_Inspection
             {
                 SaveBorder.BorderBrush = SB;
                 SaveBorder.Background = LSB;
+                ButtonBack();
+                EditSwitch.IsOn = false;
+                
             }
+
+
+
+        }
+
+        private void TrashUnclick(object sender, PointerRoutedEventArgs e)
+        {
+            if (EditSwitch.IsOn)
+            {
+                TrashBorder.BorderBrush = SB;
+                TrashBorder.Background = LSB;
+                
+                EditSwitch.IsOn = false;
+                ButtonBack();
+            }
+            
 
         }
 
@@ -658,6 +774,56 @@ namespace Quality_Inspection
             {
                 LidCheck_true.IsChecked = false;
             }
+        }
+
+        private void ChoseThis(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            String selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem.TrimEnd();
+        }
+
+        private void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            List<String> masterPartList = new List<string>();
+            sender.Text = sender.Text.ToUpper();
+            String thisString = "SELECT DISTINCT PartNumber FROM QualityCheck ORDER BY PartNumber;";
+            //Creates Master List of Part from Database
+            using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = thisString;
+                    try
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                String getter = reader.GetString(0).TrimEnd();
+                                masterPartList.Add(getter);
+                            }
+                        }
+                    }
+                    catch (Exception e) {  }
+                }
+            }
+            //Generate Auto-Complete Suggestions
+            try
+            {
+                if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+                {
+                    List<string> suggestions = SearchControls(sender.Text);
+                    sender.ItemsSource = suggestions;
+                }
+                List<string> SearchControls(string query)
+                {
+                    var suggestions = new List<string>();
+                    suggestions = masterPartList.Where(x => x.StartsWith(query)).ToList();
+                    return suggestions;
+                }
+            }
+            catch (Exception e) {  }
         }
     }
 

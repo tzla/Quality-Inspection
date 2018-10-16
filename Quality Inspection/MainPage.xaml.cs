@@ -639,8 +639,9 @@ namespace Quality_Inspection
             LightLeds();
         }
 
-
-
+        /// <summary>
+        /// Indicates which hourly checks have been completed with "LEDS". 
+        /// </summary>
         private bool[] GetLEDS(int lineNumber)
         {
             bool[] output = new bool[9];
@@ -756,7 +757,7 @@ namespace Quality_Inspection
                         }
                         catch (Exception e) { LogError(e.ToString());}
                     }
-                    if (badData && (dater != DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"))) { ClearData(); }
+                    
                 }
             }
         }
@@ -817,9 +818,14 @@ namespace Quality_Inspection
             }
             catch (Exception e) { LogError(e.ToString()); }
         }
+
+
+
+        /// <summary>
+        /// Clear the form data. Here in case of use. 
+        /// </summary>
         private void ClearData()
         {
-            /*
             PartBox.Text = "";
             NoteBox.Text = "";
             SampleCheck_false.IsChecked = SampleCheck_true.IsChecked = false;
@@ -830,7 +836,7 @@ namespace Quality_Inspection
             inkyCanvas.InkPresenter.StrokeContainer = null;
             inkyCanvasDS.InkPresenter.StrokeContainer = null;
             inkyCanvasSup.InkPresenter.StrokeContainer = null;
-            */
+            
         }
 
 
@@ -847,7 +853,7 @@ namespace Quality_Inspection
         /// <summary>
         /// Creates daily error log ....eventually
         /// </summary>
-        private async void LogError(String e)
+        public async void LogError(String e)
         {
             Console.WriteLine(e + " @ " + DateTimeOffset.Now.ToString());
         }

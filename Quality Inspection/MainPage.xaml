@@ -26,15 +26,15 @@
                 <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Shift:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <ComboBox x:Name="RealShiftBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" SelectionChanged="ShiftChange" />
                 <StackPanel HorizontalAlignment="Center" Height="10" VerticalAlignment="Top" Width="75" Margin="-65,40,0,0" Orientation="Horizontal">
-                    <Ellipse x:Name="S1" HorizontalAlignment="Left" Height="8" VerticalAlignment="Center" Width="8"/>
-                    <Ellipse x:Name="S2" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S3" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S4" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S5" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S6" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S7" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S8" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
-                    <Ellipse x:Name="S9" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0"/>
+                    <Ellipse x:Name="S1" HorizontalAlignment="Left" Height="8" VerticalAlignment="Center" Width="8" Stroke="Black"/>
+                    <Ellipse x:Name="S2" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S3" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S4" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S5" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S6" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S7" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S8" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
+                    <Ellipse x:Name="S9" HorizontalAlignment="Center" Height="8" VerticalAlignment="Center" Width="8" Margin="0,0,0,0" Stroke="Black"/>
                 </StackPanel>
             </StackPanel>
             <CheckBox x:Name="SampleCheck_true" Content="Production Pan Matches Sample" HorizontalAlignment="Left" Margin="45,72,0,0" VerticalAlignment="Top" Checked="SampleCheck"/>
