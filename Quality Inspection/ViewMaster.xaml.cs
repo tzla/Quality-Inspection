@@ -306,6 +306,47 @@ namespace Quality_Inspection
 
                                 LineBox.SelectedIndex = reader.GetInt32(10);
 
+                                QT_Initials.Text = reader.GetString(11);
+                                DS_Initials.Text = reader.GetString(12);
+                                String date2 = date.Replace('-', '_');
+                                StorageFolder mainFolder = await KnownFolders.MusicLibrary.CreateFolderAsync(date2, CreationCollisionOption.OpenIfExists);
+                                IReadOnlyList<StorageFolder> Folders = await mainFolder.GetFoldersAsync();
+                                List<String> folderNames = new List<string>();
+
+                                foreach(StorageFolder thisFolder in Folders)
+                                {
+                                    folderNames.Add(thisFolder.Name);
+                                }
+                                ObservableCollection<String> checkNames = new ObservableCollection<string>();
+                                if (folderNames.Contains("Morning"))
+                                {
+                                    this.Background = LSB;
+                                    checkNames = ShiftSource;
+                                }
+                                else if (folderNames.Contains("Shift Start"))
+                                {
+                                    this.Background = SB;
+                                    checkNames = newShiftSource;
+                                }
+                                String shiftName = checkNames[reader.GetByte(3)];
+                                StorageFolder sigFolder = await mainFolder.CreateFolderAsync(shiftName, CreationCollisionOption.OpenIfExists);
+                                StorageFile newFile = await sigFolder.CreateFileAsync(reader.GetString(13).TrimEnd(), CreationCollisionOption.OpenIfExists);
+
+                                // User selects a file and picker returns a reference to the selected file.
+                                if (newFile != null)
+                                {
+                                    // Open a file stream for reading.
+                                    IRandomAccessStream stream = await newFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
+
+                                    // Read from file.
+                                    using (var inputStream = stream.GetInputStreamAt(0))
+                                    {
+                                        await inkyCanvas.InkPresenter.StrokeContainer.LoadAsync(inputStream);
+                                        this.Background = White;
+                                    }
+                                    stream.Dispose();
+                                }
+                            
                                 PartBox.Text = reader.GetString(5).TrimEnd();
 
                                 SampleCheck_true.IsChecked = reader.GetBoolean(6);
@@ -338,100 +379,11 @@ namespace Quality_Inspection
                 }
 
             }
-
-            // gg.Text = loadCheck.partName;
             GGG.Visibility = Visibility.Collapsed;
             DDD.Visibility = Visibility.Visible;
-            /*loadDate.Date = loadCheck.date;
-            Time.Text = loadCheck.date.ToString("hh:mm");
-            PartBox.Text = loadCheck.partName;
-            LineBox.Text = loadCheck.lineName.ToString() ;
-            ShiftBox.Text = ShiftSource[loadCheck.checkNumber];
-            NoteBox.Text = loadCheck.notes;
-            if (loadCheck.sampleMatch)
-            {
-                SampleCheck_true.IsChecked = true;
-            }
-            else
-            {
-                SampleCheck_false.IsChecked = true;
-            }
-            if (loadCheck.lidMatch)
-            {
-                LidCheck_true.IsChecked = true;
-            }
-            else
-            {
-                LidCheck_false.IsChecked = true;
-            }
-            if (loadCheck.boxMatch)
-            {
-                PackageCheck_true.IsChecked = true;
-            }
-            else
-            {
-                PackageCheck_false.IsChecked = true;
-            }
-            if (loadCheck.defects)
-            {
-                DefectCheck_true.IsChecked = true;
-            }
-            else
-            {
-                DefectCheck_false.IsChecked = true;
-            }
-            try { QT_Initials.Text = loadCheck.initals[0]; } catch{ }
-            try { DS_Initials.Text = loadCheck.initals[1]; } catch{ }
-            if (loadCheck.defectList[0]) { D0.IsChecked = true; }
-            if (loadCheck.defectList[1]) { D1.IsChecked = true; }
-            if (loadCheck.defectList[2]) { D2.IsChecked = true; }
-            if (loadCheck.defectList[3]) { D3.IsChecked = true; }
-            if (loadCheck.defectList[4]) { D4.IsChecked = true; }
-            if (loadCheck.defectList[5]) { D5.IsChecked = true; }
-            if (loadCheck.defectList[6]) { D6.IsChecked = true; }
-            if (loadCheck.defectList[7]) { D7.IsChecked = true; }
-            if (loadCheck.defectList[8]) { D8.IsChecked = true; }
-            if (loadCheck.defectList[9]) { D9.IsChecked = true; }
-            if (loadCheck.defectList[10]) { D10.IsChecked = true; }
-            if (loadCheck.defectList[11]) { D11.IsChecked = true; }
-
-
-
-            try {
-                localFile = await shiftFolder.GetFileAsync(loadCheck.sigPath[0]); 
-                // User selects a file and picker returns a reference to the selected file.
-                if (localFile != null)
-                {
-                    // Open a file stream for reading.
-                    IRandomAccessStream stream = await localFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                    // Read from file.
-                    using (var inputStream = stream.GetInputStreamAt(0))
-                    {
-                        await inkyCanvas.InkPresenter.StrokeContainer.LoadAsync(stream);
-                    }
-                    stream.Dispose();
-                }
-            } catch { }
-            try
-            {
-                localFile = await shiftFolder.GetFileAsync(loadCheck.sigPath[1]);
-                if (localFile != null)
-                {
-                    // Open a file stream for reading.
-                    IRandomAccessStream stream = await localFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                    // Read from file.
-                    using (var inputStream = stream.GetInputStreamAt(0))
-                    {
-                        await inkyCanvasDS.InkPresenter.StrokeContainer.LoadAsync(stream);
-                    }
-                    stream.Dispose();
-                }
-            }
-            catch { }
-
-    */
-            //gg.Text = name;
         }
+
+
         private void ClickView(object sender, PointerRoutedEventArgs e)
         {
             ViewBorder.BorderBrush = SLB;
@@ -683,6 +635,13 @@ namespace Quality_Inspection
                         catch (Exception ee) { String error = ee.ToString(); }
                     }
                 }
+
+                int col = Convert.ToInt16(mySpecialID.Split('-')[4]);
+                int row = Convert.ToInt16(mySpecialID.Split('-')[5]);
+                List<Button> thisButtonList = buttonTracker[col];
+                Button myButton = thisButtonList[row];
+                myButton.Content = "N/A";
+                myButton.IsEnabled = false;
 
 
 
