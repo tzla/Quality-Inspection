@@ -265,7 +265,50 @@ namespace Quality_Inspection
             NoteBox.IsReadOnly = !state;
         }
 
+        private async void loadSig(String date2, int shift, String pather, InkCanvas inky)
+        {
+            try
+            {
+                StorageFolder mainFolder = await KnownFolders.MusicLibrary.CreateFolderAsync(date2, CreationCollisionOption.OpenIfExists);
+                IReadOnlyList<StorageFolder> Folders = await mainFolder.GetFoldersAsync();
+                List<String> folderNames = new List<string>();
 
+                foreach (StorageFolder thisFolder in Folders)
+                {
+                    folderNames.Add(thisFolder.Name);
+                }
+                ObservableCollection<String> checkNames = new ObservableCollection<string>();
+                if (folderNames.Contains("Morning"))
+                {
+                    checkNames = ShiftSource;
+                }
+                else if (folderNames.Contains("Shift Start"))
+                {
+                    checkNames = newShiftSource;
+                }
+
+                String shiftName = checkNames[shift];
+                StorageFolder sigFolder = await mainFolder.CreateFolderAsync(shiftName, CreationCollisionOption.OpenIfExists);
+                StorageFile newFile = await sigFolder.CreateFileAsync(pather, CreationCollisionOption.OpenIfExists);
+
+
+                // User selects a file and picker returns a reference to the selected file.
+                if (newFile != null)
+                {
+                    // Open a file stream for reading.
+                    IRandomAccessStream stream = await newFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
+
+                    // Read from file.
+                    using (var inputStream = stream.GetInputStreamAt(0))
+                    {
+                        await inky.InkPresenter.StrokeContainer.LoadAsync(inputStream);
+
+                    }
+                    stream.Dispose();
+                }
+            }
+            catch { }
+        }
 
         private async void buttonClick(object sender, RoutedEventArgs e)
         {
@@ -308,45 +351,17 @@ namespace Quality_Inspection
 
                                 QT_Initials.Text = reader.GetString(11);
                                 DS_Initials.Text = reader.GetString(12);
+                                Sup_Initials.Text = reader.GetString(17);
+
+                               
+                                
                                 String date2 = date.Replace('-', '_');
-                                StorageFolder mainFolder = await KnownFolders.MusicLibrary.CreateFolderAsync(date2, CreationCollisionOption.OpenIfExists);
-                                IReadOnlyList<StorageFolder> Folders = await mainFolder.GetFoldersAsync();
-                                List<String> folderNames = new List<string>();
+                                try { loadSig(date2, reader.GetByte(3), reader.GetString(13).TrimEnd(), inkyCanvas); } catch { }
+                                try { loadSig(date2, reader.GetByte(3), reader.GetString(14).TrimEnd(), inkyCanvasDS); } catch { }
+                                try { loadSig(date2, reader.GetByte(3), reader.GetString(18).TrimEnd(), inkyCanvasSup); } catch { }
 
-                                foreach(StorageFolder thisFolder in Folders)
-                                {
-                                    folderNames.Add(thisFolder.Name);
-                                }
-                                ObservableCollection<String> checkNames = new ObservableCollection<string>();
-                                if (folderNames.Contains("Morning"))
-                                {
-                                    this.Background = LSB;
-                                    checkNames = ShiftSource;
-                                }
-                                else if (folderNames.Contains("Shift Start"))
-                                {
-                                    this.Background = SB;
-                                    checkNames = newShiftSource;
-                                }
-                                String shiftName = checkNames[reader.GetByte(3)];
-                                StorageFolder sigFolder = await mainFolder.CreateFolderAsync(shiftName, CreationCollisionOption.OpenIfExists);
-                                StorageFile newFile = await sigFolder.CreateFileAsync(reader.GetString(13).TrimEnd(), CreationCollisionOption.OpenIfExists);
 
-                                // User selects a file and picker returns a reference to the selected file.
-                                if (newFile != null)
-                                {
-                                    // Open a file stream for reading.
-                                    IRandomAccessStream stream = await newFile.OpenAsync(Windows.Storage.FileAccessMode.Read);
 
-                                    // Read from file.
-                                    using (var inputStream = stream.GetInputStreamAt(0))
-                                    {
-                                        await inkyCanvas.InkPresenter.StrokeContainer.LoadAsync(inputStream);
-                                        this.Background = White;
-                                    }
-                                    stream.Dispose();
-                                }
-                            
                                 PartBox.Text = reader.GetString(5).TrimEnd();
 
                                 SampleCheck_true.IsChecked = reader.GetBoolean(6);

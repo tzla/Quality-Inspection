@@ -84,8 +84,8 @@
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerPressed="ConfirmData" PointerReleased="ClickUnSave" ToolTipService.ToolTip="Save Current Sheet"/>
             </Border>
         </Grid>
-        <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
-        <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="801,247,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
+        <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials" TextChanged="InitialLength"/>
+        <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="801,247,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials" TextChanged="InitialLength"/>
         <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,131,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
@@ -129,7 +129,7 @@
 
 
         </Grid>
-        <TextBox x:Name="Sup_Initials" HorizontalAlignment="Left" Margin="801,310,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials"/>
+        <TextBox x:Name="Sup_Initials" HorizontalAlignment="Left" Margin="801,310,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials" TextChanged="InitialLength"/>
 
 
     </Grid>

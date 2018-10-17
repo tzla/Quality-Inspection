@@ -71,19 +71,19 @@
                 <TextBlock HorizontalAlignment="Center" Text="Hour 8" TextWrapping="Wrap" VerticalAlignment="Top" Margin="0,0,0,0"  Grid.Column="9" Height="Auto"/>
             </Grid>
         </Border>
-        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="229,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" Width="1195">
+        <Border x:Name="DDD" HorizontalAlignment="Left" Height="589" Margin="37,38,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" Width="1195">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="1137">
-                <ToggleSwitch x:Name="EditSwitch" Header="Edit" HorizontalAlignment="Left" Margin="897,203,0,0" VerticalAlignment="Top" Width="94" Toggled="EditSwitcher"/>
+                <ToggleSwitch x:Name="EditSwitch" Header="Edit" HorizontalAlignment="Left" Margin="434,82,0,0" VerticalAlignment="Top" Width="94" Toggled="EditSwitcher"/>
                 <RelativePanel HorizontalAlignment="Left" Height="128" Margin="49,387,0,0" VerticalAlignment="Top" Width="333">
                     <TextBox x:Name="NoteBox" HorizontalAlignment="Left" Margin="57,0,0,0" Text="" VerticalAlignment="Center" Width="276" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxWidth="300" TextWrapping="Wrap" Height="128" IsReadOnly="True"/>
                     <TextBlock HorizontalAlignment="Left" Text="Notes:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 </RelativePanel>
-                <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1116" Margin="-28,0,0,0">
+                <Grid HorizontalAlignment="Left" Height="403" VerticalAlignment="Top" Width="1165" Margin="-28,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="513*"/>
                         <ColumnDefinition Width="551*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Center" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,20,0,0" Width="1146">
+                    <StackPanel Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="49" Orientation="Horizontal" VerticalAlignment="Top" Margin="10,18,0,0" Width="1146">
                         <DatePicker x:Name="loadDate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="35,0,0,0" />
                         <TextBlock HorizontalAlignment="Center" Margin="25,0,0,0" Text="Part Number:" TextWrapping="Wrap" VerticalAlignment="Center"/>
                         <AutoSuggestBox x:Name="PartBox" HorizontalAlignment="Left" Text="" VerticalAlignment="Center" Margin="5.2,0,0,0" Width="150" PlaceholderText="Part #" TextChanged="PartLookupTextChanged" SuggestionChosen="ChoseThis"/>
@@ -128,18 +128,20 @@
                         <CheckBox x:Name="D10" Content="Wrinkled Edges" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2" Tag="Defect"/>
                         <CheckBox x:Name="D11" Content="Cracks" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Grid.RowSpan="1" Tag="Defect" />
                     </Grid>
-                    <TextBlock x:Name="QT_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,180,0,0" Text="" VerticalAlignment="Top" />
-                    <TextBlock x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="255.2,247,0,0" Text="" VerticalAlignment="Top" />
-                    <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="382.2,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
+                    <TextBox x:Name="QT_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="266.4,180,0,0" Text="" VerticalAlignment="Top" IsEnabled="False" />
+                    <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="265.4,247,0,0" Text="" VerticalAlignment="Top" IsEnabled="False"/>
+                    <TextBox x:Name="Sup_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="265.4,314,0,0" Text="" VerticalAlignment="Top" IsEnabled="False"/>
+                    <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="352.2,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
                         <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
                     </Border>
-                    <TextBlock Text="Diesetter Signiture:" HorizontalAlignment="Left" Margin="554,257,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
+                    <TextBlock Text="Diesetter Signiture:" HorizontalAlignment="Left" Margin="553,259,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
+                    <TextBlock Text="Supervisor Signiture:" HorizontalAlignment="Left" Margin="543,326,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
                 </Grid>
-                <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,131,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
+                <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="558,131,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
                     <Grid.RenderTransform>
                         <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
                     </Grid.RenderTransform>
-                    <InkCanvas x:Name="inkyCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="298" Height="131.2" Margin="42,-66,0,0">
+                    <InkCanvas x:Name="inkyCanvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="298" Height="131.2" Margin="32,0,0,0">
                         <InkCanvas.RenderTransform>
                             <CompositeTransform ScaleX="1" ScaleY="1"/>
                         </InkCanvas.RenderTransform>
@@ -165,6 +167,18 @@
                 <Border x:Name="TrashBorder" HorizontalAlignment="Left" Height="100" Margin="1010,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="Gray" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightGray" Visibility="Visible">
                     <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/full-trash.png" Width="80" Height="80" PointerReleased="TrashUnclick" ToolTipService.ToolTip="Delete Sheet" PointerPressed="TrashClick"/>
                 </Border>
+                <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,263,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <CompositeTransform ScaleX="0.25" ScaleY="0.25"/>
+                    </Grid.RenderTransform>
+                    <InkCanvas x:Name="inkyCanvasSup" HorizontalAlignment="Left" VerticalAlignment="Top" Width="298" Height="131.2" Margin="54,0,0,0">
+                        <InkCanvas.RenderTransform>
+                            <CompositeTransform ScaleX="1" ScaleY="1"/>
+                        </InkCanvas.RenderTransform>
+                    </InkCanvas>
+
+
+                </Grid>
 
 
             </Grid>

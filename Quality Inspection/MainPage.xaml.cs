@@ -857,5 +857,15 @@ namespace Quality_Inspection
         {
             Console.WriteLine(e + " @ " + DateTimeOffset.Now.ToString());
         }
+
+        private void InitialLength(object sender, TextChangedEventArgs e)
+        {
+            TextBox initials = sender as TextBox;
+            if(initials.Text.Length>3)
+            {
+                initials.Text = initials.Text.Remove(3);
+            }
+            
+        }
     }
 }
