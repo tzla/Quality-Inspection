@@ -135,6 +135,11 @@ namespace Quality_Inspection
             }, period);
             DefectListSetup();//create list of the defect boxes
             isLoaded = true;//loaded flag is on. prevents unneccessary actions
+            foreach (CheckBox checkLister in DefectList)
+            {
+                checkLister.IsEnabled = false;
+                checkLister.IsChecked = false; //clears defects if part is defect free
+            }
         }
 
         /// <summary>
@@ -549,7 +554,7 @@ namespace Quality_Inspection
             }
             else if (bord.Name == "SearchBorder")
             {
-                this.Frame.Navigate(typeof(Search), PartSearcher);
+                this.Frame.Navigate(typeof(Search));
             }
         }
 
