@@ -81,7 +81,7 @@
             </Border>
             <Button Content="Supervisor Signiture" HorizontalAlignment="Left" Margin="532,314,0,0" VerticalAlignment="Top" Click="SaveSigSup" Padding="3,4,3,4" Grid.ColumnSpan="2" ToolTipService.ToolTip="Open Supervisor Signature Window"/>
             <Border x:Name="SaveBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="286.6,95,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
-                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerPressed="ConfirmData" PointerReleased="ClickUnSave" ToolTipService.ToolTip="Save Current Sheet"/>
+                <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerPressed="ConfirmData" PointerReleased="ClickUnview" ToolTipService.ToolTip="Save Current Sheet"/>
             </Border>
         </Grid>
         <TextBox x:Name="QT_Initials" HorizontalAlignment="Left" Margin="801,180,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Initials" TextChanged="InitialLength"/>

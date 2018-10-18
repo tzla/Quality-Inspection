@@ -37,8 +37,6 @@ namespace Quality_Inspection
         ObservableCollection<string> ShiftSource = new ObservableCollection<string> { "Shift Start", "Hour 1", "First Break", "Hour 3", "Hour 4", "After Lunch", "Hour 6", "Second Break", "Hour 8" };//check times
         ObservableCollection<string> RealShiftSource = new ObservableCollection<string> { "1st", "2nd", "3rd" };//list of shifts
 
-
-
         public SolidColorBrush LSB = new SolidColorBrush(Windows.UI.Colors.LightSteelBlue);//pre-loaded colors for UI
         public SolidColorBrush SB = new SolidColorBrush(Windows.UI.Colors.SteelBlue);
         SolidColorBrush LG = new SolidColorBrush(Windows.UI.Colors.LightGray);
@@ -64,8 +62,6 @@ namespace Quality_Inspection
         InkStrokeContainer[] twoSigs = new InkStrokeContainer[3];//stores the two signatures 
 
         List<DateTimeOffset> masterList = new List<DateTimeOffset>();//creates a master list of active days for calender search
-        //PartMaster partMasterList = new PartMaster();//indexes individual quality reports by line number,date, and shift
-
 
         /// <summary>
         /// Tracks the line a specific part ran on for run day
@@ -83,22 +79,6 @@ namespace Quality_Inspection
         {
             public string partName { get; set; }
             public List<MyDate> dates { get; set; }
-        }
-
-        /// <summary>
-        /// Indexes part name and line with corresponding notes for each day. 
-        /// </summary>
-        public class PartMaster
-        {
-            public string[] morningList { get; set; } //lists of part names corresponding to line number
-            public string[] firstList { get; set; }
-            public string[] lunchList { get; set; }
-            public string[] secondList { get; set; }
-
-            public bool[] morningNotes { get; set; } //corresponding quality notes 
-            public bool[] firstNotes { get; set; }
-            public bool[] lunchNotes { get; set; }
-            public bool[] secondNotes { get; set; }
         }
         
         bool isLoaded = false; //tracks if program is loaded 
@@ -187,6 +167,7 @@ namespace Quality_Inspection
                 twoSigs[0] = thisStrokes;
             }
         }
+
         /// <summary>
         /// Saves Diesetter signature to sig list
         /// </summary>
@@ -203,7 +184,7 @@ namespace Quality_Inspection
         }
 
         /// <summary>
-        /// Saves Diesetter signature to sig list
+        /// Saves Supervisor signature to sig list
         /// </summary>
         private async void SaveSigSup(object sender, RoutedEventArgs e)
         {
@@ -216,7 +197,6 @@ namespace Quality_Inspection
                 twoSigs[2] = thisStrokes;
             }
         }
-        
 
         /// <summary>
         /// Processes the sample match checkboxes
@@ -278,6 +258,9 @@ namespace Quality_Inspection
             newCheck.lidMatch = whichBox;
         }
 
+        /// <summary>
+        /// Process SQL write strings
+        /// </summary>
         private void SQLSaver(String thisString)
         {
             using (conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
@@ -297,10 +280,8 @@ namespace Quality_Inspection
                     }
                     catch (Exception ee) { LogError(ee.ToString()); }
                 }
-
             }
         }
-
 
         /// <summary>
         /// Processes the defect checkboxes
@@ -351,7 +332,7 @@ namespace Quality_Inspection
         }
 
         /// <summary>
-        /// Processes the signature for QA Tech
+        /// Processes and saves signatures. 
         /// </summary>
         private async Task SaveSign(String ID, int index)
         {
@@ -390,9 +371,10 @@ namespace Quality_Inspection
             }
             return list;
         }
-
-
-
+        
+        /// <summary>
+        /// Finds last part made on specified line for confirmation of part change
+        /// </summary>
         private String GetLastPart()
         {
             String output = "SELECT TOP 1 PartNumber From QualityCheck WHERE LineNumber = " + newCheck.lineName.ToString() + " ORDER BY CheckDate DESC, CheckNo DESC;";
@@ -415,13 +397,9 @@ namespace Quality_Inspection
                     }
                     catch (Exception e) { LogError(e.ToString()); }
                 }
-
             }
             return recentName;
         }
-
-
-
 
         /// <summary>
         /// Processes and Saves the entered data
@@ -449,19 +427,10 @@ namespace Quality_Inspection
                     PrimaryButtonText = "Save",
                     SecondaryButtonText = "Cancel"
                 };
-
                 var result = await noWifiDialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    
-                }
-                else
-                {
-                    return;
-                }
-
+                if (result == ContentDialogResult.Primary) {}
+                else { return;}
             }
-            
 
                 string[] initials = { QT_Initials.Text, DS_Initials.Text, Sup_Initials.Text };
                 newCheck.initals = initials;
@@ -470,26 +439,19 @@ namespace Quality_Inspection
                 try { await SaveSign("DSSig_", 1); } catch (Exception ee) { LogError(ee.ToString()); }
                 try { await SaveSign("SupSig_", 2); } catch (Exception ee) { LogError(ee.ToString()); }
 
-
                 if (!masterList.Contains(dateBox.Date.Date))//adds date to master date list if not already on it
                 {
                     masterList.Add(dateBox.Date.Date);
                 }
-
-
                 newCheck.defects = Convert.ToBoolean(DefectCheck_true.IsChecked);
                 try { newCheck.defectList = DefectListMaker(); } catch (Exception ee) { LogError(ee.ToString()); }
                 try { newCheck.notes = NoteBox.Text; } catch (Exception ee) { LogError(ee.ToString()); }
-
                 String sqlString = sqlMaker(newCheck, dateBox.Date.Date.ToString("yyyy-MM-dd"));
                 SQLSaver(sqlString);
-
                 this.Background = White;
                 LightLeds(); //adds visual cue for shift already saved
                 NoteBox.Text = "";
                 PartBox.Text = PartBox.Text.TrimEnd();
-            
-            
         }
 
         /// <summary>
@@ -513,12 +475,6 @@ namespace Quality_Inspection
                 else if (checkNo == 6) { thisTime = "13:00:00"; }
                 else if (checkNo == 7) { thisTime = "14:10:00"; }
                 else if (checkNo == 8) { thisTime = "15:00:00"; }
-                //output += thisTime + "',";
-
-            }
-            else
-            {
-                
             }
             output += DateTimeOffset.Now.ToString("HH:mm:ss") + "',";
             output += checkNo.ToString() + ",";
@@ -534,15 +490,14 @@ namespace Quality_Inspection
             try { output += thisCheck.notes + "','"; } catch { }
             output += dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + checkNo + "-" + (thisCheck.lineName).ToString();
             output += "'); ";
-
-                String specialID = "'" + dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + checkNo + "-" + (thisCheck.lineName).ToString() + "'";
-                SQLDefectMaker(specialID,thisCheck);
-
-            //output = "INSERT INTO QualityCheck(CheckDate, CheckTime, CheckNo, SampleMatch, CheckShift, LineNumber, PartNumber) Values('2018-10-04', '12:24:10', 0, 2, 0, 3, 'WM88-173');";
+            String specialID = "'" + dater + "-" + RealShiftBox.SelectedIndex.ToString() + "-" + checkNo + "-" + (thisCheck.lineName).ToString() + "'";
+            SQLDefectMaker(specialID,thisCheck);
             return output;
         }
 
-
+        /// <summary>
+        /// Processes data for list of defects and saves to database
+        /// </summary>
         private void SQLDefectMaker(String specialID,QualityCheck thisCheck)
         {
             String output = "INSERT INTO QualityCheckDefects(SpecialCheck,Scratches,Dents,Sharps,LooseCups,Discoloration,Rust,CoatingPeel,Delamination,UnevenBottom,OpenCurl,Wrinkles,Cracks)";
@@ -576,9 +531,7 @@ namespace Quality_Inspection
                     }
                     catch (Exception e) { LogError(e.ToString()); }
                 }
-
             }
-
         }
             
         /// <summary>
@@ -611,15 +564,6 @@ namespace Quality_Inspection
             bord.Background = LSB;
         }
 
-
-        private void ClickUnSave(object sender, PointerRoutedEventArgs e)
-        {
-            Image pic = sender as Image;
-            Border bord = pic.Parent as Border;
-            bord.BorderBrush = SB;
-            bord.Background = LSB;
-        }
-
         /// <summary>
         /// Reloads data if a different date is selected. 
         /// </summary>
@@ -628,6 +572,7 @@ namespace Quality_Inspection
             NoteBox.Text = "";
             loadChange();
             DefectListSetup();
+            LightLeds();
         }
 
         /// <summary>
@@ -635,7 +580,6 @@ namespace Quality_Inspection
         /// </summary>
         private void LoadShiftLED(object sender, SelectionChangedEventArgs e)
         {
-           
             LightLeds();
         }
 
@@ -678,7 +622,6 @@ namespace Quality_Inspection
             }
             return output;
         }
-
 
         /// <summary>
         /// Creates the visual cues for which shifts are already entered,
@@ -819,8 +762,6 @@ namespace Quality_Inspection
             catch (Exception e) { LogError(e.ToString()); }
         }
 
-
-
         /// <summary>
         /// Clear the form data. Here in case of use. 
         /// </summary>
@@ -839,8 +780,6 @@ namespace Quality_Inspection
             
         }
 
-
-
         /// <summary>
         /// Handles the autosuggestion selection
         /// </summary>
@@ -858,6 +797,9 @@ namespace Quality_Inspection
             Console.WriteLine(e + " @ " + DateTimeOffset.Now.ToString());
         }
 
+        /// <summary>
+        /// Checks and limits initals to 3 characters. 
+        /// </summary>
         private void InitialLength(object sender, TextChangedEventArgs e)
         {
             TextBox initials = sender as TextBox;

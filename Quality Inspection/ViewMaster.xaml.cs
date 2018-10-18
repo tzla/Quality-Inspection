@@ -47,11 +47,6 @@ namespace Quality_Inspection
         List<DateTimeOffset> masterList = new List<DateTimeOffset>(); //master date list for enabling worked days
         List<List<Button>> buttonTracker = new List<List<Button>>(); //list of generated buttons
         MainPage.QualityCheck loadCheck = new MainPage.QualityCheck(); //the selected quality report
-        MainPage.PartMaster partMasterList = new MainPage.PartMaster(); //list used to populate buttons
-
-        List<string> MasterPartList = new List<string>(); //!!!! unsure why this is here
-
-        StorageFolder shiftFolder;
 
         bool load = false; //two load flags
         bool load2 = false;
@@ -67,7 +62,6 @@ namespace Quality_Inspection
             public String[] SpecialID { get; set; }
         }
 
-
         /// <summary>
         /// Initialize component
         /// </summary>
@@ -81,8 +75,7 @@ namespace Quality_Inspection
             RealShiftBox.ItemsSource = RealShifts;
             Shifter.SelectedIndex = 0;
         }
-
-
+        
         /// <summary>
         /// Processes the navigation from MainPage
         /// </summary>
@@ -101,12 +94,15 @@ namespace Quality_Inspection
             Cale.SetDisplayDate(DateTimeOffset.Now.Date);
             SQL_Loader(DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"));
             ButtonSetUp();
-            loadMaster();
+            ButtonBob();
             chooseDate = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd");
             DDD.Visibility = Visibility.Collapsed;
 
         }
 
+        /// <summary>
+        /// Loads dates with runs to populate the calendar picker
+        /// </summary>
         private void SQL_MasterDate()
         {
             String output = "SELECT DISTINCT CheckDate FROM QualityCheck ORDER BY CheckDate;";
@@ -121,20 +117,15 @@ namespace Quality_Inspection
                     {
                         while (reader.Read())
                         {
-                            //string[] parts = reader.GetString(0).Split('-');
-                            //DateTime dt = new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
                             try
                             {
                                 DateTimeOffset dayer = reader.GetDateTime(0);
-
                                 masterList.Add(dayer);
                             }
                             catch (Exception ee)
                             {
                                 Console.WriteLine(ee.ToString());
                             }
-
-
                         }
                     }
 
@@ -143,12 +134,14 @@ namespace Quality_Inspection
 
         }
 
+        /// <summary>
+        /// Loads the part data for the selected date 
+        /// </summary>
         private void SQL_Loader(String date)
         {
             String output = "SELECT PartNumber,CheckNo,CheckShift,LineNumber,SpecialCheck FROM QualityCheck";
             output += " WHERE (CheckDate = '";
             output += date + "');";
-
             using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
             {
                 conn.Open();
@@ -173,21 +166,24 @@ namespace Quality_Inspection
                     }
                     catch (Exception ee) { String error = ee.ToString(); }
                 }
-
             }
         }
 
+        /// <summary>
+        /// Runs through each column to create the button matrix
+        /// </summary>
         private void ButtonSetUp()
         {
-            if (load2)
+            for (int i = 1; i < 10; i++)
             {
-                //Grud.Children.Clear();
+                makeButtons(i);
             }
-            makeButtons(1); makeButtons(2); makeButtons(3); makeButtons(4);
-            makeButtons(5); makeButtons(6); makeButtons(7); makeButtons(8); makeButtons(9);
             load2 = true;
         }
 
+        /// <summary>
+        /// Creates individual matrix buttons for a single column 
+        /// </summary>
         private void makeButtons(int col)
         {
             if (!load2)
@@ -208,7 +204,7 @@ namespace Quality_Inspection
                     Grid.SetColumn(newButton, col);
                     newButton.Content = "N/A";
                     buttonCol.Add(newButton);
-                    newButton.Click += buttonClick;
+                    newButton.Click += ButtonClick;
                 }
                 buttonTracker[col - 1] = buttonCol;
             }
@@ -218,6 +214,9 @@ namespace Quality_Inspection
             }
         }
 
+        /// <summary>
+        /// Loads the defects for the specified check
+        /// </summary>
         private void GetMyDefects(String SpecialID)
         {
             String output = "SELECT * FROM QualityCheckDefects WHERE(SpecialCheck = '" + SpecialID + "');";
@@ -245,8 +244,6 @@ namespace Quality_Inspection
                                 D9.IsChecked = reader.GetBoolean(10);
                                 D10.IsChecked = reader.GetBoolean(11);
                                 D11.IsChecked = reader.GetBoolean(12);
-
-
                             }
                         }
                     }
@@ -255,6 +252,9 @@ namespace Quality_Inspection
             }
         }
 
+        /// <summary>
+        /// Processes the edit toggle switch
+        /// </summary>
         private void OnOffState(bool state)
         {
             D0.IsEnabled = D1.IsEnabled = D2.IsEnabled = D3.IsEnabled = D4.IsEnabled = D5.IsEnabled = D6.IsEnabled
@@ -265,6 +265,9 @@ namespace Quality_Inspection
             NoteBox.IsReadOnly = !state;
         }
 
+        /// <summary>
+        /// Loads a signature for the specified check/person
+        /// </summary>
         private async void loadSig(String date2, int shift, String pather, InkCanvas inky)
         {
             try
@@ -310,7 +313,10 @@ namespace Quality_Inspection
             catch { }
         }
 
-        private async void buttonClick(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Loads the specified check 
+        /// </summary>
+        private void ButtonClick(object sender, RoutedEventArgs e)
         {
             Button clickedButton = sender as Button;
             String[] locate = clickedButton.Name.Split('_');
@@ -318,9 +324,6 @@ namespace Quality_Inspection
             Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Collapsed;
             loadDate.IsEnabled = ShiftBox.IsEnabled = RealShiftBox.IsEnabled = LineBox.IsEnabled = false;
 
-
-
-            //gg.Text = clickedButton.Name;
             String date = "";
             try { date = chooseDate; }
             catch { date = DateTimeOffset.Now.Date.ToString("yyyy-MM-dd"); }
@@ -398,7 +401,9 @@ namespace Quality_Inspection
             DDD.Visibility = Visibility.Visible;
         }
 
-
+        /// <summary>
+        /// Returns to button matrix from sheet. 
+        /// </summary>
         private void ClickView(object sender, PointerRoutedEventArgs e)
         {
             ViewBorder.BorderBrush = SLB;
@@ -407,13 +412,9 @@ namespace Quality_Inspection
             EditSwitch.IsOn = false;
         }
 
-        private void ClickUnview(object sender, PointerRoutedEventArgs e)
-        {
-            ViewBorder.BorderBrush = SB;
-            ViewBorder.Background = LSB;
-            ButtonBack();
-        }
-
+        /// <summary>
+        /// Switches the current view on page
+        /// </summary>
         private async void ButtonBack()
         {
             GGG.Visibility = Visibility.Visible;
@@ -421,13 +422,10 @@ namespace Quality_Inspection
             Cale.Visibility = Shifter.Visibility = gg.Visibility = BackButton.Visibility = Visibility.Visible;
         }
 
-
-        private async void loadMaster()
-        {
-            buttonBob();
-        }
-
-        private async void buttonBob()
+        /// <summary>
+        /// Fills out the button information
+        /// </summary>
+        private async void ButtonBob()
         {
             foreach (GetCheck thisCheck in loadChecks)
             {
@@ -441,7 +439,10 @@ namespace Quality_Inspection
             }
         }
 
-        private async void CalendarView_CalendarViewDayItemChanging(CalendarView sender, CalendarViewDayItemChangingEventArgs args)
+        /// <summary>
+        /// Enables/Disables calender days. 
+        /// </summary>
+        private void CalendarView_CalendarViewDayItemChanging(CalendarView sender, CalendarViewDayItemChangingEventArgs args)
         {
             if (!load)
             {
@@ -470,13 +471,12 @@ namespace Quality_Inspection
             else
             {
                 args.Item.Background = new SolidColorBrush(Windows.UI.Colors.Aquamarine);
-
             }
         }
-        private async Task saveMaster()
-        {
-        }
 
+        /// <summary>
+        /// Removes all buttons from matrix grid. 
+        /// </summary>
         private void ClearButtons()
         {
             foreach (List<Button> thisCol in buttonTracker)
@@ -488,9 +488,11 @@ namespace Quality_Inspection
             }
         }
 
-        private async void ButtonTask()
+        /// <summary>
+        /// Handles button tasks
+        /// </summary>
+        private void ButtonTask()
         {
-            
             loadChecks.Clear();
             SQL_Loader(chooseDate);
             ClearButtons();
@@ -502,24 +504,30 @@ namespace Quality_Inspection
                 buttonTracker.Add(newList);
             }
             ButtonSetUp();
-
-
-            loadMaster();
+            ButtonBob();
         }
-        
-        private async void hola(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
+
+        /// <summary>
+        /// Handles switching days on calendar
+        /// </summary>
+        private void CalendarTasks(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
         {
-            //this.Background = Red;
             load2 = false;
             try { chooseDate = Cale.SelectedDates[0].Date.ToString("yyyy-MM-dd"); } catch { }
             ButtonTask(); 
         }
 
+        /// <summary>
+        /// Home button returns to main page
+        /// </summary>
         private void BackToMain(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(MainPage));
         }
 
+        /// <summary>
+        /// Processes the edit switch on individual sheets
+        /// </summary>
         private void EditSwitcher(object sender, RoutedEventArgs e)
         {
             ToggleSwitch editer = sender as ToggleSwitch;
@@ -541,6 +549,9 @@ namespace Quality_Inspection
             }
         }
 
+        /// <summary>
+        /// After editing a sheet, handles the modifcation to the database
+        /// </summary>
         private void SaveClick(object sender, PointerRoutedEventArgs e)
         {
             if (EditSwitch.IsOn)
@@ -559,8 +570,6 @@ namespace Quality_Inspection
                 if ((bool)DefectCheck_true.IsChecked) { output += "1, "; } else { output += "0, "; }
                 output += "Notes = '" + NoteBox.Text + "' ";
                 output += " WHERE SpecialCheck = '" + mySpecialID.ToString() + "';";
-
-                String output2 = "UPDATE QualityCheckDefects SET ";
 
                 using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-10DBF13\SQLEXPRESS;Initial Catalog=QualityControl;Integrated Security=SSPI"))
                 {
@@ -587,20 +596,13 @@ namespace Quality_Inspection
                 List<Button> thisButtonList = buttonTracker[col];
                 Button myButton = thisButtonList[row];
                 myButton.Content = content;
-
-
-
-
-
-
-
-
-
             }
 
         }
 
-
+        /// <summary>
+        /// Handles deleting sheet from database (does not delete signature file)
+        /// </summary>
         private void TrashClick(object sender, PointerRoutedEventArgs e)
         {
             if (EditSwitch.IsOn)
@@ -670,35 +672,22 @@ namespace Quality_Inspection
 
         }
 
-        private void SaveUnclick(object sender, PointerRoutedEventArgs e)
+        /// <summary>
+        /// Handles the click release for icons
+        /// </summary>
+        private void Unclick(object sender, PointerRoutedEventArgs e)
         {
-            if (EditSwitch.IsOn)
-            {
-                SaveBorder.BorderBrush = SB;
-                SaveBorder.Background = LSB;
-                ButtonBack();
-                EditSwitch.IsOn = false;
-                
-            }
-
-
-
+            Image pic = sender as Image;
+            Border bord = pic.Parent as Border;
+            bord.BorderBrush = SB;
+            bord.Background = LSB;
+            EditSwitch.IsOn = false;
+            ButtonBack();
         }
 
-        private void TrashUnclick(object sender, PointerRoutedEventArgs e)
-        {
-            if (EditSwitch.IsOn)
-            {
-                TrashBorder.BorderBrush = SB;
-                TrashBorder.Background = LSB;
-                
-                EditSwitch.IsOn = false;
-                ButtonBack();
-            }
-            
-
-        }
-
+        /// <summary>
+        /// Handles sample match boxes
+        /// </summary>
         private void SampleCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
@@ -715,6 +704,9 @@ namespace Quality_Inspection
             }
         }
 
+        /// <summary>
+        /// Handles package match boxes
+        /// </summary>
         private void PackageCheck(object sender, RoutedEventArgs e)
         {
             CheckBox thisBox = sender as CheckBox;
@@ -750,12 +742,18 @@ namespace Quality_Inspection
             }
         }
 
+        /// <summary>
+        /// Fills the part box with the chosen autosuggestion
+        /// </summary>
         private void ChoseThis(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             String selectedItem = args.SelectedItem.ToString();
             sender.Text = selectedItem.TrimEnd();
         }
 
+        /// <summary>
+        /// Handles autosuggestion for part box
+        /// </summary>
         private void PartLookupTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             List<String> masterPartList = new List<string>();

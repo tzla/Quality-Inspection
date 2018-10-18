@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <CalendarView x:Name="Cale" HorizontalAlignment="Left" Margin="37,38,0,0" VerticalAlignment="Top" CalendarViewDayItemChanging="CalendarView_CalendarViewDayItemChanging" SelectedDatesChanged="hola"/>
+        <CalendarView x:Name="Cale" HorizontalAlignment="Left" Margin="37,38,0,0" VerticalAlignment="Top" CalendarViewDayItemChanging="CalendarView_CalendarViewDayItemChanging" SelectedDatesChanged="CalendarTasks"/>
         <TextBox x:Name="gg" HorizontalAlignment="Left" Margin="204,399,0,0" Text="TextBox" VerticalAlignment="Top" Width="159"/>
         <Border x:Name="GGG" HorizontalAlignment="Left" Height="500" Margin="457,80,0,0" VerticalAlignment="Top" BorderBrush="LightSteelBlue" BorderThickness="3,3,3,3" d:IsHidden="True">
             <Grid x:Name="Grud" HorizontalAlignment="Left" VerticalAlignment="Center" Width="850">
@@ -132,7 +132,7 @@
                     <TextBox x:Name="DS_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="265.4,247,0,0" Text="" VerticalAlignment="Top" IsEnabled="False"/>
                     <TextBox x:Name="Sup_Initials" Grid.Column="1" HorizontalAlignment="Left" Margin="265.4,314,0,0" Text="" VerticalAlignment="Top" IsEnabled="False"/>
                     <Border x:Name="ViewBorder" Grid.Column="1" HorizontalAlignment="Left" Height="100" Margin="352.2,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="SteelBlue" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightSteelBlue">
-                        <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="ClickUnview"/>
+                        <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/cal.png" Width="80" Height="80" PointerPressed="ClickView" PointerReleased="Unclick"/>
                     </Border>
                     <TextBlock Text="Diesetter Signiture:" HorizontalAlignment="Left" Margin="553,259,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
                     <TextBlock Text="Supervisor Signiture:" HorizontalAlignment="Left" Margin="543,326,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" />
@@ -162,10 +162,10 @@
 
                 </Grid>
                 <Border x:Name="SaveBorder" HorizontalAlignment="Left" Height="100" Margin="1010,180,0,0" VerticalAlignment="Top" Width="100" BorderBrush="Gray" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightGray" Visibility="Visible">
-                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerReleased="SaveUnclick" ToolTipService.ToolTip="Save Edit" PointerPressed="SaveClick"/>
+                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/saveicon.png" Width="80" Height="80" PointerReleased="Unclick" ToolTipService.ToolTip="Save Edit" PointerPressed="SaveClick"/>
                 </Border>
                 <Border x:Name="TrashBorder" HorizontalAlignment="Left" Height="100" Margin="1010,303,0,0" VerticalAlignment="Top" Width="100" BorderBrush="Gray" BorderThickness="3,3,3,3" CornerRadius="5,5,5,5" Background="LightGray" Visibility="Visible">
-                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/full-trash.png" Width="80" Height="80" PointerReleased="TrashUnclick" ToolTipService.ToolTip="Delete Sheet" PointerPressed="TrashClick"/>
+                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="Assets/full-trash.png" Width="80" Height="80" PointerReleased="Unclick" ToolTipService.ToolTip="Delete Sheet" PointerPressed="TrashClick"/>
                 </Border>
                 <Grid HorizontalAlignment="Left" Height="131" VerticalAlignment="Top" Margin="547,263,0,0" BorderBrush="Black" BorderThickness="0,0,0,5" RenderTransformOrigin="0.5,0.5">
                     <Grid.RenderTransform>
